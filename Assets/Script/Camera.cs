@@ -2,17 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class Camera : MonoBehaviour
 {
     #region Variables
 
-    public float height = 1f;
-    public float distance = 3f;
+    public Vector3 offset;
     public float lookAtHeight = 2f;
     public float smoothSpeed = 0.5f;
+    public float distance;
 
-    private Vector3 boxPosition;
-    public Vector3 boxSize = new Vector3(4, 2, 2);
+    private float x;
+    private float y;
+    public float xRotSpeed = 10.0f;
+    public float yRotSpeed = 10.0f;
 
     public Transform target;
 
@@ -24,55 +27,39 @@ public class Camera : MonoBehaviour
 
     private void Start()
     {
-        HandleCamera();
+        offset = offset.normalized;
+        transform.position = target.position + offset * distance;
     }
 
     private void LateUpdate()
     {
         HandleCamera();
-
-        boxPosition = transform.position;
-        boxPosition.z += 2f;
-
-        Collider[] targets = Physics.OverlapBox(boxPosition, boxSize * 0.5f, transform.rotation, obstacleMask);
-
-        foreach (Collider target in targets)
-        {
-            StartCoroutine(disableRayHitObject(target.gameObject));
-        }
-    }
-
-    IEnumerator disableRayHitObject(GameObject go)
-    {
-        if (go.activeSelf)
-            go.SetActive(false);
-
-        yield return new WaitForSeconds(1.0f);
-
-        go.SetActive(true);
     }
 
     public void HandleCamera()
     {
         if (!target) return;
 
-        // Calc world position vector
-        Vector3 worldPosition = (Vector3.forward * distance) + (Vector3.up * height);
-        //Debug.DrawLine(target.position, worldPosition, Color.red);
+        if (Input.GetMouseButton(1))
+        {
+            x = Input.GetAxis("Mouse X") * xRotSpeed;
+            y = Input.GetAxis("Mouse Y") * yRotSpeed;
 
-        // Calc rotate vector
-        Vector3 rotatedVector = Quaternion.AngleAxis(180f, Vector3.up) * worldPosition;
-        //Debug.DrawLine(target.position, rotatedVector, Color.green);
+            transform.RotateAround(target.transform.position, Vector3.up, x);
+            transform.RotateAround(target.transform.position, Vector3.left, y);
 
-        // Move camera position
-        Vector3 flatTargetPosition = target.position;
-        flatTargetPosition.y += lookAtHeight;
+            offset = (transform.position - target.position).normalized;
+        }
 
-        Vector3 finalPosition = flatTargetPosition + rotatedVector;
-        //Debug.DrawLine(target.position, finalPosition, Color.blue);
+        Vector3 calcPosition = target.position + offset * distance;
+        float clampY = Mathf.Clamp(calcPosition.y, 1, 5);
+        Vector3 finalPosition = new(calcPosition.x, clampY, calcPosition.z);
+
+        Vector3 lookAtPosition = target.position;
+        lookAtPosition.y += lookAtHeight;
 
         transform.position = Vector3.SmoothDamp(transform.position, finalPosition, ref refVelocity, smoothSpeed);
-        transform.LookAt(flatTargetPosition);
+        transform.LookAt(lookAtPosition);
     }
 
     private void OnDrawGizmos()
@@ -86,8 +73,5 @@ public class Camera : MonoBehaviour
             Gizmos.DrawSphere(lookAtPosition, 0.25f);
         }
         Gizmos.DrawSphere(transform.position, 0.25f);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(boxPosition, boxSize);
     }
 }
