@@ -247,6 +247,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4000011596552724, guid: 126cd587c28004e4285dc7f5c3939a03, type: 3}
   m_PrefabInstance: {fileID: 75474338}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &105368603 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4437949324969624246, guid: b1786097602c54f65b9d7efaf9ca48c4, type: 3}
+  m_PrefabInstance: {fileID: 1100373663}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &106190616
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2116,8 +2121,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 779912624}
-  m_LocalRotation: {x: 0.20343696, y: 0, z: 0, w: 0.97908807}
-  m_LocalPosition: {x: -12.9, y: 3.251583, z: -103.93553}
+  m_LocalRotation: {x: 0.20343676, y: 0, z: 0, w: 0.9790881}
+  m_LocalPosition: {x: 2.9901886, y: 3.1925545, z: -29.667322}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2142,7 +2147,7 @@ MonoBehaviour:
   distance: 5
   xRotSpeed: 10
   yRotSpeed: 10
-  target: {fileID: 0}
+  target: {fileID: 105368603}
   obstacleMask:
     serializedVersion: 2
     m_Bits: 256
