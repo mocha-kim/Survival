@@ -7,26 +7,20 @@ using UnityEngine.UI;
 using TMPro;
 
 [RequireComponent(typeof(EventTrigger))]
-public class InventoryUI : MonoBehaviour
+public abstract class InventoryUI : MonoBehaviour
 {
     public InventoryObject inventoryObject;
     public Dictionary<GameObject, InventorySlot> slots = new();
 
     [SerializeField]
-    private GameObject slotParent;
-    [SerializeField]
-    private bool needToResize = false;
-    [SerializeField]
-    private GameObject slotPrefab;
-    [SerializeField]
-    private Vector2 start;
-    [SerializeField]
-    private Vector2 space;
-    [SerializeField]
-    private int colNum;
-    private float size;
+    protected Sprite[] slotBackgounds;
+    protected GameObject previousSlot;
 
-    private void Awake()
+    [SerializeField]
+    protected GameObject description;
+    protected bool isDescriptionOpened = false;
+
+    protected virtual void Awake()
     {
         CreateSlots();
 
@@ -35,49 +29,17 @@ public class InventoryUI : MonoBehaviour
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInventory(gameObject); });
     }
 
-    private void Start()
+    protected virtual void Start()
     {
-        if (needToResize)
-        {
-            float y = 2 * Mathf.Abs(start.y) - size + (inventoryObject.Slots.Length / colNum) * (size + space.y) - space.y;
-            slotParent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, y);
-        }
-
         for (int i = 0; i < inventoryObject.Slots.Length; ++i)
         {
             inventoryObject.Slots[i].UpdateSlot(inventoryObject.Slots[i].item, inventoryObject.Slots[i].amount);
         }
     }
 
-    private void CreateSlots()
-    {
-        size = slotPrefab.GetComponent<RectTransform>().sizeDelta.x;
-        for (int i = 0; i < inventoryObject.Slots.Length; i++)
-        {
-            GameObject newSlot = Instantiate(slotPrefab, slotParent.transform);
-            newSlot.name += ": " + i;
+    protected abstract void CreateSlots();
 
-            float x = start.x + ((space.x + size) * (i % colNum));
-            float y = start.y + (-(space.y + size) * (i / colNum));
-            newSlot.GetComponent<RectTransform>().anchoredPosition = new Vector3(x, y, 0f);
-
-            // slot related events
-            AddEvent(newSlot, EventTriggerType.PointerEnter, delegate { OnEnterSlot(newSlot); });
-            AddEvent(newSlot, EventTriggerType.PointerExit, delegate { OnExitSlot(newSlot); });
-            AddEvent(newSlot, EventTriggerType.BeginDrag, delegate { OnStartDrag(newSlot); });
-            AddEvent(newSlot, EventTriggerType.Drag, delegate { OnDrag(newSlot); });
-            AddEvent(newSlot, EventTriggerType.EndDrag, delegate { OnEndDrag(newSlot); });
-            AddEvent(newSlot, EventTriggerType.PointerClick, (data) => { OnClick(newSlot, (PointerEventData)data); });
-
-            inventoryObject.Slots[i].slotUI = newSlot;
-            inventoryObject.Slots[i].parent = inventoryObject;
-            inventoryObject.Slots[i].OnPostUpdate += OnPostUpdate;
-
-            slots.Add(newSlot, inventoryObject.Slots[i]);
-        }
-    }
-
-    private void AddEvent(GameObject go, EventTriggerType triggerType, UnityAction<BaseEventData> action)
+    protected virtual void AddEvent(GameObject go, EventTriggerType triggerType, UnityAction<BaseEventData> action)
     {
         EventTrigger trigger = go.GetComponent<EventTrigger>();
         if (!trigger)
@@ -89,6 +51,26 @@ public class InventoryUI : MonoBehaviour
         EventTrigger.Entry eventTrigger = new EventTrigger.Entry { eventID = triggerType };
         eventTrigger.callback.AddListener(action);
         trigger.triggers.Add(eventTrigger);
+    }
+
+    protected virtual void UpdateDescriptions(InventorySlot slot)
+    {
+        TextMeshProUGUI[] texts = description.GetComponentsInChildren<TextMeshProUGUI>();
+        texts[0].text = slot.item.name;
+        texts[1].text = slot.ItemObject.EffectsToString();
+        texts[2].text = slot.ItemObject.description;
+    }
+
+    public virtual void EnableDescription()
+    {
+        isDescriptionOpened = true;
+        description.SetActive(true);
+    }
+
+    public virtual void DisableDescription()
+    {
+        isDescriptionOpened = false;
+        description.SetActive(false);
     }
 
     public void OnPostUpdate(InventorySlot slot)
@@ -108,7 +90,7 @@ public class InventoryUI : MonoBehaviour
         MouseData.mouseHoveredInventory = null;
     }
 
-    public void OnEnterSlot(GameObject go)
+    public virtual void OnEnterSlot(GameObject go)
     {
         MouseData.mouseHoverdSlot = go;
     }
@@ -169,6 +151,22 @@ public class InventoryUI : MonoBehaviour
         InventorySlot slot = slots[go];
         if (slot == null) return;
 
+        if (previousSlot != null)
+        {
+            previousSlot.GetComponentInChildren<Image>().sprite = slotBackgounds[0];
+            previousSlot = null;
+        }
+
+        if (slot.item.id == -1)
+        {
+            DisableDescription();
+            return;
+        }
+
+        previousSlot = go;
+        go.GetComponentInChildren<Image>().sprite = slotBackgounds[1];
+        Debug.Log(this + " OnClick " + slot.item.name);
+
         if (data.button == PointerEventData.InputButton.Left)
         {
             OnLeftClick(slot);
@@ -182,7 +180,8 @@ public class InventoryUI : MonoBehaviour
 
     private void OnLeftClick(InventorySlot slot)
     {
-
+        EnableDescription();
+        UpdateDescriptions(slot);
     }
 
     private void OnRightClick(InventorySlot slot)

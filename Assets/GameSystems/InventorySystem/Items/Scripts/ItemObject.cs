@@ -13,4 +13,33 @@ public class ItemObject : ScriptableObject
 
     [TextArea(15, 20)]
     public string description;
+
+    public string EffectsToString()
+    {
+        string result = "";
+
+        foreach (ItemEffect effect in data.effects)
+        {
+            switch (effect.type)
+            {
+                case EffectType.Status:
+                    result += effect.statusType.ToString() + " ";
+                    result += effect.value >= 0 ? "+" : "-";
+                    result += effect.value.ToString("n0");
+                    break;
+                case EffectType.Attribute:
+                    result += effect.attributeType.ToString() + " ";
+                    result += effect.value >= 0 ? "+" : "-";
+                    result += effect.value.ToString("n0");
+                    break;
+                case EffectType.Condition:
+                    result += effect.conditionType.ToString() + " " + effect.value.ToString() + "s";
+                    break;
+            }
+            result += "\n";
+        }
+        result.Remove(result.Length - 1);
+
+        return result;
+    }
 }

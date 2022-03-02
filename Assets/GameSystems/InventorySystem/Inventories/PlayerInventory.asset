@@ -24,10 +24,74 @@ MonoBehaviour:
       amount: 0
     - allowedType: 
       item:
+        id: 1
+        name: Baseball Bat
+        effects:
+        - type: 1
+          statusType: 0
+          attributeType: 1
+          conditionType: 0
+          value: 2
+      amount: 1
+    - allowedType: 
+      item:
         id: -1
         name: 
         effects: []
       amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: 1
+        name: Baseball Bat
+        effects:
+        - type: 1
+          statusType: 0
+          attributeType: 1
+          conditionType: 0
+          value: 2
+      amount: 1
     - allowedType: 
       item:
         id: -1
@@ -84,64 +148,15 @@ MonoBehaviour:
       amount: 0
     - allowedType: 
       item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
+        id: 1
+        name: Baseball Bat
+        effects:
+        - type: 1
+          statusType: 0
+          attributeType: 1
+          conditionType: 0
+          value: 2
+      amount: 1
     - allowedType: 
       item:
         id: -1

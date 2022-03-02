@@ -9,11 +9,14 @@ public class TimeManager : MonoBehaviour
     private static TimeManager instance;
     public static TimeManager Instance => instance;
 
-    public float realtimePerHour = 60f;
+    public float realtimePerHour = 30f;
+    public float timeLeft;
     [NonSerialized]
     public float halftimeOfDay;
-    public float timeLeft;
+    [NonSerialized]
     public bool isDaytime;
+    [NonSerialized]
+    public int day;
 
     public ClockUI clock;
 
@@ -27,24 +30,21 @@ public class TimeManager : MonoBehaviour
         halftimeOfDay = realtimePerHour * 12;
 
         // get time data from file
-        timeLeft = halftimeOfDay * 2;
+        timeLeft = halftimeOfDay;
         isDaytime = true;
+        day = 1;
     }
 
     private void Update()
     {
         timeLeft -= Time.deltaTime;
 
-        if (timeLeft <= halftimeOfDay && isDaytime)
+        if (timeLeft <= 0)
         {
+            timeLeft = halftimeOfDay;
             isDaytime = !isDaytime;
-            clock.ChangeBackgroundSprite(isDaytime);
-        }
-        else if (timeLeft <= 0 && !isDaytime)
-        {
-            timeLeft = halftimeOfDay * 2;
-            isDaytime = !isDaytime;
-            clock.ChangeBackgroundSprite(isDaytime);
+            day = isDaytime ? day + 1 : day;
+            clock.UpdateClockUI();
         }
     }
 }

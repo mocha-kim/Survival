@@ -2,35 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ClockUI : MonoBehaviour
 {
-    public Slider clock;
+    private Slider clock;
 
-    public Image fill;
-    public Color[] fillColors;
-    public Image background;
-    public Sprite[] backgroundSprits;
+    [SerializeField]
+    private Image fill;
+    [SerializeField]
+    private Color[] fillColors;
+
+    [SerializeField]
+    private TextMeshProUGUI dayText;
+    [SerializeField]
+    private Color[] textColors;
+
+    private int maxValue = 12;
+    private int calcValue;
 
     private float TimeLeft => TimeManager.Instance.timeLeft;
+    private bool IsDaytime => TimeManager.Instance.isDaytime;
 
     private void Start()
     {
-        fill.color = fillColors[0];
-        background.sprite = backgroundSprits[0];
+        // init image components
+        fill.color = IsDaytime ? fillColors[0] : fillColors[1];
+        dayText.color = IsDaytime ? textColors[0] : textColors[1];
 
-        // init slider values
-        clock.maxValue = TimeManager.Instance.halftimeOfDay * 2;
+        // init clock vlaues
+        clock = GetComponent<Slider>();
+        calcValue = maxValue;
+        clock.maxValue = maxValue;
+        clock.value = maxValue;
     }
 
     private void Update()
     {
-        clock.value = TimeLeft;
+        calcValue = (int)Mathf.Ceil(TimeLeft / (float)TimeManager.Instance.realtimePerHour);
+        if (clock.value > calcValue)
+        {
+            clock.value = calcValue;
+        }
     }
 
-    public void ChangeBackgroundSprite(bool isDaytime)
+    public void UpdateClockUI()
     {
-        fill.color = isDaytime ? fillColors[0] : fillColors[1];
-        //background.sprite = isDaytime ? backgroundSprits[0] : backgroundSprits[1];
+        fill.color = IsDaytime ? fillColors[0] : fillColors[1];
+        dayText.color = IsDaytime ? textColors[0] : textColors[1];
+        dayText.text = "DAY " + TimeManager.Instance.day;
+        calcValue = maxValue;
+        clock.value = maxValue;
     }
 }

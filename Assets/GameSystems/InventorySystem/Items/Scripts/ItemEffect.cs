@@ -12,5 +12,5 @@ public class ItemEffect
     public AttributeType attributeType;
     public ConditionType conditionType;
 
-    public int value;
+    public float value;
 }

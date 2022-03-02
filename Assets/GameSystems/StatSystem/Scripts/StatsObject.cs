@@ -13,9 +13,25 @@ public class StatsObject : ScriptableObject
     public Condition[] conditions;
 
     public Action<StatsObject> OnStatChanged;
-    public Action<StatsObject, ConditionType> OnConditionChanged;
+    public Action<StatsObject, Condition> OnConditionChanged;
     [NonSerialized]
     public bool isInitialized = false;
+
+    public int CountActivatedConditions
+    {
+        get
+        {
+            int count = 0;
+            foreach (Condition condition in conditions)
+            {
+                if (condition.isActive)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    }
 
     private void OnEnable()
     {
@@ -92,16 +108,20 @@ public class StatsObject : ScriptableObject
         }
     }
 
-    public void ActivateCondition(ConditionType type)
+    public void ActivateCondition(Condition condition, float activationTime)
     {
-        conditions[(int)type].isActive = true;
-        OnConditionChanged?.Invoke(this, type);
+        Debug.Log("Activate " + condition.type + ", " + activationTime);
+        condition.isActive = true;
+        condition.activationTime += activationTime;
+        OnConditionChanged?.Invoke(this, condition);
     }
 
-    public void DeactivateCondition(ConditionType type)
+    public void DeactivateCondition(Condition condition)
     {
-        conditions[(int)type].isActive = false;
-        OnConditionChanged?.Invoke(this, type);
+        Debug.Log("Deactivate " + condition.type);
+        condition.isActive = false;
+        condition.activationTime = 0;
+        OnConditionChanged?.Invoke(this, condition);
     }
 
     // calculate HP and SP value when CON changed

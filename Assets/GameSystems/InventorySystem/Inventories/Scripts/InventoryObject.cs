@@ -56,7 +56,7 @@ public class InventoryObject : ScriptableObject
         }
         else
         {
-            slotToAdd.AddItem(item, amount);
+            slotToAdd.AddItemAmount(amount);
         }
 
         return true;
