@@ -13,4 +13,16 @@ public class Condition
 
     public bool isActive;
     public float activationTime;
+
+    public int DisplayTime
+    {
+        get
+        {
+            if (activationTime >= 60)
+            {
+                return Mathf.FloorToInt(activationTime / 60);
+            }
+            return Mathf.FloorToInt(activationTime);
+        }
+    }
 }

@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Stats", menuName = "Stat System/New Stats")]
+[CreateAssetMenu(fileName = "Stats", menuName = "Stat System/Stats")]
 public class StatsObject : ScriptableObject
 {
     // Index order must be the same as order of each types
@@ -14,7 +12,6 @@ public class StatsObject : ScriptableObject
 
     public Action<StatsObject> OnStatChanged;
     public Action<StatsObject, Condition> OnConditionChanged;
-    [NonSerialized]
     public bool isInitialized = false;
 
     public int CountActivatedConditions
@@ -41,7 +38,9 @@ public class StatsObject : ScriptableObject
     private void InitStats()
     {
         if (isInitialized)
+        {
             return;
+        }
 
         isInitialized = true;
 
@@ -53,11 +52,17 @@ public class StatsObject : ScriptableObject
         }
 
         // init attributes
-        foreach (Attribute attribute in attributes)
+        for (int i = 0; i < 3; i++)
         {
-            attribute.baseValue = 10;
-            attribute.modifiedValue = 10;
-            attribute.exp = 0;
+            attributes[i].baseValue = 10;
+            attributes[i].modifiedValue = 10;
+            attributes[i].exp = 0;
+        }
+        for (int i = 3; i < 5; i++)
+        {
+            attributes[i].baseValue = 1;
+            attributes[i].modifiedValue = 1;
+            attributes[i].exp = 0;
         }
 
         // init conditions
@@ -71,7 +76,6 @@ public class StatsObject : ScriptableObject
     {
         int updatedValue = statuses[(int)type].currentValue + value;
         updatedValue = Math.Clamp(updatedValue, 0, statuses[(int)type].maxValue);
-        Debug.Log(type.ToString() + ": " + updatedValue);
         statuses[(int)type].currentValue = updatedValue;
 
         OnStatChanged?.Invoke(this);
@@ -79,7 +83,10 @@ public class StatsObject : ScriptableObject
 
     public void AddAttributeValue(AttributeType type, int value)
     {
-        if (value < 0) return;
+        if (value < 0)
+        {
+            return;
+        }
 
         attributes[(int)type].modifiedValue += value;
 
@@ -92,7 +99,10 @@ public class StatsObject : ScriptableObject
 
     public void AddAttributeExp(AttributeType type, float value)
     {
-        if (value < 0) return;
+        if (value < 0)
+        {
+            return;
+        }
 
         attributes[(int)type].exp += value;
         if (attributes[(int)type].exp >= 100)
@@ -119,6 +129,54 @@ public class StatsObject : ScriptableObject
     public void DeactivateCondition(Condition condition)
     {
         Debug.Log("Deactivate " + condition.type);
+        condition.isActive = false;
+        condition.activationTime = 0;
+        OnConditionChanged?.Invoke(this, condition);
+    }
+
+    public void ActivateCondition(ConditionType type, float activationTime)
+    {
+        Debug.Log("Activate " + type + ", " + activationTime);
+
+        Condition condition = null;
+
+        foreach (Condition c in conditions)
+        {
+            if (c.type == type)
+            {
+                condition = c;
+                break;
+            }
+        }
+        if (condition == null)
+        {
+            return;
+        }
+
+        condition.isActive = true;
+        condition.activationTime += activationTime;
+        OnConditionChanged?.Invoke(this, condition);
+    }
+
+    public void DeactivateCondition(ConditionType type)
+    {
+        Debug.Log("Deactivate " + type);
+
+        Condition condition = null;
+
+        foreach (Condition c in conditions)
+        {
+            if (c.type == type)
+            {
+                condition = c;
+                break;
+            }
+        }
+        if (condition == null)
+        {
+            return;
+        }
+
         condition.isActive = false;
         condition.activationTime = 0;
         OnConditionChanged?.Invoke(this, condition);

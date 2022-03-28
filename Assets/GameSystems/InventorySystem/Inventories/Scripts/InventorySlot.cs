@@ -58,6 +58,7 @@ public class InventorySlot
 
     public void RemoveItem()
     {
+        QuestManager.Instance.ProcessQuest(QuestType.AcquireItem, item.id, -amount);
         UpdateSlot(null, 0);
     }
 

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c0fec3ef465412f86fe7661a2ca09d, type: 3}
+  m_Name: TestQuest
+  m_EditorClassIdentifier: 
+  data:
+    id: 0
+    targetID: 0
+    currentCount: 0
+    goalCount: 5
+    rewardGold: 100
+    rewardItemIds: 
+  type: 0
+  camp: 0
+  status: 1
+  title: "\uD14C\uC2A4\uD2B81"
+  description: "0\uBC88 \uC801\uC744 5\uB9C8\uB9AC \uC7A1\uB294 \uD018\uC2A4\uD2B8"

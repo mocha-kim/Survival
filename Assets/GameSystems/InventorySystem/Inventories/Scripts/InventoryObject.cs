@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Inventory", menuName = "Inventory System/New Inventory")]
+[CreateAssetMenu(fileName = "Inventory", menuName = "Inventory System/Inventory")]
 public class InventoryObject : ScriptableObject
 {
     public InventoryType type;
@@ -12,9 +10,9 @@ public class InventoryObject : ScriptableObject
     [SerializeField]
     private Inventory data = new(24);
 
-    public Action<ItemObject> OnUseItem;
-
     public InventorySlot[] Slots => data.slots;
+
+    public Action<ItemObject> OnUseItem;
 
     public int EmptySlotCount
     {
@@ -59,6 +57,7 @@ public class InventoryObject : ScriptableObject
             slotToAdd.AddItemAmount(amount);
         }
 
+        QuestManager.Instance.ProcessQuest(QuestType.AcquireItem, item.id, amount);
         return true;
     }
 
@@ -67,8 +66,27 @@ public class InventoryObject : ScriptableObject
         return Slots.FirstOrDefault(i => i.item.id == itemObject.data.id) != null;
     }
 
+    public bool IsContain(int id)
+    {
+        return Slots.FirstOrDefault(i => i.item.id == id) != null;
+    }
+
+    public int CountItem(int id)
+    {
+        int count = 0;
+        foreach (InventorySlot slot in Slots)
+        {
+            if (slot.item.id == id)
+            {
+                count += slot.amount;
+            }
+        }
+        return count;
+    }
+
     public void SwapItems(InventorySlot slotA, InventorySlot slotB)
     {
+        Debug.Log("Swap items : " + slotA + ", " + slotB);
         if (slotA == slotB)
         {
             return;
@@ -76,20 +94,31 @@ public class InventoryObject : ScriptableObject
 
         if (slotA.AllowedToPlace(slotB.ItemObject) && slotB.AllowedToPlace(slotA.ItemObject))
         {
-            InventorySlot tmpSlot = new InventorySlot(slotB.item, slotB.amount);
-            slotB.UpdateSlot(slotA.item, slotA.amount);
-            slotA.UpdateSlot(tmpSlot.item, tmpSlot.amount);
+            if ((slotA.item.id == slotB.item.id) && slotA.ItemObject.isStackable)
+            {
+                int value = slotA.amount;
+                slotA.RemoveItem();
+                slotB.AddItemAmount(value);
+            }
+            else
+            {
+                InventorySlot tmpSlot = new InventorySlot(slotB.item, slotB.amount);
+                slotB.UpdateSlot(slotA.item, slotA.amount);
+                slotA.UpdateSlot(tmpSlot.item, tmpSlot.amount);
+            }
         }
     }
 
     public void UseItem(InventorySlot slot)
     {
         if (slot.ItemObject == null || slot.item.id < 0 || slot.amount <= 0)
+        {
             return;
+        }
 
-        ItemObject itemObject = slot.ItemObject;
+        QuestManager.Instance.ProcessQuest(QuestType.AcquireItem, slot.item.id, -1);
+
+        OnUseItem?.Invoke(slot.ItemObject);
         slot.UpdateSlot(slot.item, slot.amount - 1);
-
-        OnUseItem.Invoke(itemObject);
     }
 }

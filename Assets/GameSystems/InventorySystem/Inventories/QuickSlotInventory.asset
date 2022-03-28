@@ -16,25 +16,35 @@ MonoBehaviour:
   database: {fileID: 11400000, guid: 22e4de9c605694b178d52a65ff020790, type: 2}
   data:
     slots:
-    - allowedType: 
+    - allowedType: 000000000100000002000000
       item:
         id: -1
         name: 
         effects: []
       amount: 0
-    - allowedType: 
+    - allowedType: 000000000100000002000000
+      item:
+        id: 0
+        name: Potato
+        effects:
+        - type: 0
+          statusType: 0
+          attributeType: 0
+          conditionType: 0
+          value: 50
+        - type: 0
+          statusType: 2
+          attributeType: 0
+          conditionType: 0
+          value: 20
+      amount: 2
+    - allowedType: 000000000100000002000000
       item:
         id: -1
         name: 
         effects: []
       amount: 0
-    - allowedType: 
-      item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
-    - allowedType: 
+    - allowedType: 000000000100000002000000
       item:
         id: -1
         name: 
