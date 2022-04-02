@@ -39,9 +39,12 @@ Temporary Items
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
+/[Bb]in/
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
+/[Pp]ackages/
+/[Pp]roject[Ss]ettings/
 /[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
@@ -104,6 +107,15 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+/[Aa]ssets/[Aa]nimateController/
+/[Aa]ssets/[Aa]nimation/
+/[Aa]ssets/[Dd]ownloadedAsset/
+/[Aa]ssets/[Mm]odel/
+/[Aa]ssets/[Pp]refabs/
+/[Aa]ssets/[Ss]cenes/
+/[Aa]ssets/[Ss]prites/
+/[Aa]ssets/[Tt]ext[Mm]esh[Pp]ro/
 
 ### Windows ###
 # Windows thumbnail cache files
