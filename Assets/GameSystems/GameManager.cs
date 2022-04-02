@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance => instance;
 
     public StatsObject playerStats;
+    public InventoryObject inventory;
+    public InventoryObject quickslot;
+
     public bool isNewPlayer = true;
 
     public int selectedQuickslot = 0;
@@ -40,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        foreach (Condition condition in playerStats.conditions)
+        foreach (Condition condition in playerStats.conditions.Values)
         {
             if (condition.isActive)
             {
@@ -57,6 +60,20 @@ public class GameManager : MonoBehaviour
     public string GetEnemyName(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id)?.name;
     public Enemy GetEnemyData(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id);
     public Enemy GetEnemyData(string name) => enemyDatabase.datas.FirstOrDefault(i => i.name == name);
+
+    public int GetTotalItemCount(int id)
+    {
+        int count = 0;
+        if (inventory.IsContain(id))
+        {
+            count += inventory.CountItem(id);
+        }
+        if (quickslot.IsContain(id))
+        {
+            count += quickslot.CountItem(id);
+        }
+        return count;
+    }
 
     public void StopPlayer()
     {

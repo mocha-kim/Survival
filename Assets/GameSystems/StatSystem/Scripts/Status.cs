@@ -26,4 +26,11 @@ public class Status
             return (maxValue > 0 ? ((float)currentValue / (float)maxValue) : 0f);
         }
     }
+
+    public Status(StatusType type, int maxValue)
+    {
+        this.type = type;
+        this.maxValue = maxValue;
+        currentValue = maxValue;
+    }
 }

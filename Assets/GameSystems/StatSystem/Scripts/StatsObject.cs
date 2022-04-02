@@ -1,14 +1,13 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Stats", menuName = "Stat System/Stats")]
 public class StatsObject : ScriptableObject
 {
-    // Index order must be the same as order of each types
-    // This makes possible to directly access by type(use type by index)
-    public Status[] statuses;
-    public Attribute[] attributes;
-    public Condition[] conditions;
+    public SerializableDictionary<StatusType, Status> statuses = new();
+    public SerializableDictionary<AttributeType, Attribute> attributes = new();
+    public SerializableDictionary<ConditionType, Condition> conditions = new();
 
     public Action<StatsObject> OnStatChanged;
     public Action<StatsObject, Condition> OnConditionChanged;
@@ -19,7 +18,7 @@ public class StatsObject : ScriptableObject
         get
         {
             int count = 0;
-            foreach (Condition condition in conditions)
+            foreach (Condition condition in conditions.Values)
             {
                 if (condition.isActive)
                 {
@@ -45,38 +44,42 @@ public class StatsObject : ScriptableObject
         isInitialized = true;
 
         // init statuses
-        foreach (Status status in statuses)
+        for (StatusType type = StatusType.HP; type <= StatusType.Thirst; type++)
         {
-            status.maxValue = 100;
-            status.currentValue = 100;
+            Status status = new(type, 100);
+            statuses[type] = status;
+
+            Debug.Log("created " + type.ToString());
         }
 
         // init attributes
-        for (int i = 0; i < 3; i++)
+        for (AttributeType type = AttributeType.CON; type <= AttributeType.DEF; type++)
         {
-            attributes[i].baseValue = 10;
-            attributes[i].modifiedValue = 10;
-            attributes[i].exp = 0;
+            Attribute attribute = new(type, 10);
+            attributes[type] = attribute;
+            Debug.Log("created " + type.ToString());
         }
-        for (int i = 3; i < 5; i++)
+        for (AttributeType type = AttributeType.Handiness; type <= AttributeType.Cooking; type++)
         {
-            attributes[i].baseValue = 1;
-            attributes[i].modifiedValue = 1;
-            attributes[i].exp = 0;
+            Attribute attribute = new(type, 1);
+            attributes[type] = attribute;
+            Debug.Log("created " + type.ToString());
         }
 
         // init conditions
-        foreach (Condition condition in conditions)
+        for (ConditionType type = ConditionType.SwallowWound; type <= ConditionType.MentalBreakdown; type++)
         {
-            condition.isActive = false;
+            Condition condition = new(type);
+            conditions[type] = condition;
+            Debug.Log("created " + type.ToString());
         }
     }
 
     public void AddStatusValue(StatusType type, int value)
     {
-        int updatedValue = statuses[(int)type].currentValue + value;
-        updatedValue = Math.Clamp(updatedValue, 0, statuses[(int)type].maxValue);
-        statuses[(int)type].currentValue = updatedValue;
+        int updatedValue = statuses[type].currentValue + value;
+        updatedValue = Math.Clamp(updatedValue, 0, statuses[type].maxValue);
+        statuses[type].currentValue = updatedValue;
 
         OnStatChanged?.Invoke(this);
     }
@@ -88,7 +91,7 @@ public class StatsObject : ScriptableObject
             return;
         }
 
-        attributes[(int)type].modifiedValue += value;
+        attributes[type].modifiedValue += value;
 
         if (type == AttributeType.CON)
         {
@@ -104,12 +107,12 @@ public class StatsObject : ScriptableObject
             return;
         }
 
-        attributes[(int)type].exp += value;
-        if (attributes[(int)type].exp >= 100)
+        attributes[type].exp += value;
+        if (attributes[type].exp >= 100)
         {
-            attributes[(int)type].baseValue++;
-            attributes[(int)type].modifiedValue++;
-            attributes[(int)type].exp -= 100;
+            attributes[type].baseValue++;
+            attributes[type].modifiedValue++;
+            attributes[type].exp -= 100;
             if (type == AttributeType.CON)
             {
                 CalulateConstitutionEffects();
@@ -140,7 +143,7 @@ public class StatsObject : ScriptableObject
 
         Condition condition = null;
 
-        foreach (Condition c in conditions)
+        foreach (Condition c in conditions.Values)
         {
             if (c.type == type)
             {
@@ -164,7 +167,7 @@ public class StatsObject : ScriptableObject
 
         Condition condition = null;
 
-        foreach (Condition c in conditions)
+        foreach (Condition c in conditions.Values)
         {
             if (c.type == type)
             {
@@ -185,16 +188,16 @@ public class StatsObject : ScriptableObject
     // calculate HP and SP value when CON changed
     private void CalulateConstitutionEffects()
     {
-        int oldValue = statuses[(int)StatusType.HP].maxValue;
-        int newValue = statuses[(int)StatusType.HP].maxValue + (5 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
+        int oldValue = statuses[StatusType.HP].maxValue;
+        int newValue = statuses[StatusType.HP].maxValue + (5 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
 
-        statuses[(int)StatusType.HP].maxValue = newValue;
-        statuses[(int)StatusType.HP].currentValue += newValue - oldValue;
+        statuses[StatusType.HP].maxValue = newValue;
+        statuses[StatusType.HP].currentValue += newValue - oldValue;
 
-        oldValue = statuses[(int)StatusType.SP].maxValue;
-        newValue = statuses[(int)StatusType.SP].maxValue + (2 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
+        oldValue = statuses[StatusType.SP].maxValue;
+        newValue = statuses[StatusType.SP].maxValue + (2 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
 
-        statuses[(int)StatusType.SP].maxValue = newValue;
-        statuses[(int)StatusType.SP].currentValue += newValue - oldValue;
+        statuses[StatusType.SP].maxValue = newValue;
+        statuses[StatusType.SP].currentValue += newValue - oldValue;
     }
 }

@@ -20,8 +20,10 @@ public class DialogueManager : MonoBehaviour
     // Component
     public GameObject toChat;     // [F] To Chat
     public GameObject dialogueUI; // Dialogue
-    public Text nameText;     // NPC Name
-    public Text dialogueText; // NPC dialogue
+    public GameObject YesButton;  // Yes Button
+    public GameObject NoButton;   // No Button
+    public Text nameText;         // NPC Name
+    public Text dialogueText;     // NPC Dialogue
 
     // Setting
     [SerializeField]
@@ -186,6 +188,8 @@ public class DialogueManager : MonoBehaviour
     {
         toChat.SetActive(false);
         dialogueUI.SetActive(false);
+        YesButton.SetActive(false);
+        NoButton.SetActive(false);
         OnEndDialogue?.Invoke();
 
         if (!GameManager.Instance.IsGamePlaying)
@@ -204,11 +208,19 @@ public class DialogueManager : MonoBehaviour
             StopAllCoroutines();
             toChat.SetActive(false);
             dialogueUI.SetActive(false);
+            YesButton.SetActive(false);
+            NoButton.SetActive(false);
         }
 
         if (!GameManager.Instance.IsGamePlaying)
         {
             GameManager.Instance.ResumeGame();
         }
+    }
+
+    public void QuestSelection()
+    {
+        YesButton.SetActive(true);
+        NoButton.SetActive(true);
     }
 }

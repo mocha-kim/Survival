@@ -10,6 +10,7 @@ public class QuestObject : ScriptableObject
     public QuestStatus status;
 
     public string title;
+    public string summary;
     [TextArea(15, 20)]
     public string description;
 }

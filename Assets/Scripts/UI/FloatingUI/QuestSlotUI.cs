@@ -16,23 +16,37 @@ public class QuestSlotUI : MonoBehaviour
     private void Awake()
     {
         QuestManager.Instance.OnUpdateQuest += OnUpdateQuest;
+        QuestManager.Instance.OnUpdateQuestStatus += OnUpdateQuestStatus;
+        QuestManager.Instance.OnRewardedQuest += OnRewardedQuest;
     }
 
     public void UpdateTexts()
     {
         texts[0].text = quest.title;
-        if (quest.type == QuestType.AcquireItem)
-        {
-            texts[1].text = GameManager.Instance.GetItemName(quest.data.targetID);
-        }
-        else
+        if (quest.type == QuestType.DestoryEnemy)
         {
             texts[1].text = GameManager.Instance.GetEnemyName(quest.data.targetID);
         }
-        texts[2].text = quest.data.currentCount + "/" + quest.data.goalCount;
+        else
+        {
+            texts[1].text = GameManager.Instance.GetItemName(quest.data.targetID);
+        }
+        UpdateCountText();
     }
 
-    public void UpdateBackground()
+    public void UpdateCountText()
+    {
+        if (quest.data.currentCount >= quest.data.goalCount)
+        {
+            texts[2].text = "완료";
+        }
+        else
+        {
+            texts[2].text = quest.data.currentCount + "/" + quest.data.goalCount;
+        }
+    }
+
+    public void UpdateSlotStyle()
     {
         switch (quest.status)
         {
@@ -44,6 +58,9 @@ public class QuestSlotUI : MonoBehaviour
                 break;
             case QuestStatus.Rewarded:
                 GetComponent<Image>().sprite = backgrounds[2];
+                texts[0].color = Color.grey;
+                texts[1].color = Color.grey;
+                texts[2].color = Color.grey;
                 break;
             default:
                 break;
@@ -54,12 +71,18 @@ public class QuestSlotUI : MonoBehaviour
     {
         if (this.quest.data.id == quest.data.id)
         {
-            UpdateTexts();
+            UpdateCountText();
         }
     }
 
-    public void OnRewardedQuest(int index)
+    public void OnUpdateQuestStatus(QuestObject quest, bool flag)
     {
+        UpdateSlotStyle();
+    }
+
+    public void OnRewardedQuest(QuestObject quest)
+    {
+        UpdateSlotStyle();
         QuestManager.Instance.OnUpdateQuest -= OnUpdateQuest;
     }
 }

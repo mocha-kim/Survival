@@ -57,27 +57,12 @@ public class PlayerController : MonoBehaviour
         inventory.OnUseItem += OnUseItem;
         quickslot.OnUseItem += OnUseItem;
 
-        foreach (QuestObject quest in QuestManager.Instance.acceptedQuests.questObjects)
-        {
-            if (quest.type == QuestType.AcquireItem)
-            {
-                int count = 0;
-                if (inventory.IsContain(quest.data.targetID))
-                {
-                    count += inventory.CountItem(quest.data.targetID);
-                }
-                if (quickslot.IsContain(quest.data.targetID))
-                {
-                    count += quickslot.CountItem(quest.data.targetID);
-                }
-                QuestManager.Instance.SetQuestCurValue(quest, count);
-            }
-        }
+        playerStat.OnStatChanged += OnStatChanged;
     }
 
     private void Update()
     {
-        if (GameManager.Instance.IsGamePlaying)
+        if (GameManager.Instance.IsGamePlaying && (playerStat.statuses[StatusType.HP].currentValue > 0))
         {
             // Gravity : Check player is not grounded
             if (characterController.isGrounded == false)
@@ -169,6 +154,11 @@ public class PlayerController : MonoBehaviour
         isDelay = false;
     }
 
+    public void OnStatChanged(StatsObject stats)
+    {
+        // player stats 
+    }
+
     private void OnUseItem(ItemObject item)
     {
         foreach (ItemEffect effect in item.data.effects)
@@ -176,7 +166,7 @@ public class PlayerController : MonoBehaviour
             switch (effect.type)
             {
                 case EffectType.Status:
-                    foreach (Status status in playerStat.statuses)
+                    foreach (Status status in playerStat.statuses.Values)
                     {
                         if (status.type == effect.statusType)
                         {
@@ -186,7 +176,7 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case EffectType.Attribute:
-                    foreach (Attribute attribute in playerStat.attributes)
+                    foreach (Attribute attribute in playerStat.attributes.Values)
                     {
                         if (attribute.type == effect.attributeType)
                         {
@@ -196,7 +186,7 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case EffectType.Condition:
-                    foreach (Condition condition in playerStat.conditions)
+                    foreach (Condition condition in playerStat.conditions.Values)
                     {
                         if (condition.type == effect.conditionType)
                         {

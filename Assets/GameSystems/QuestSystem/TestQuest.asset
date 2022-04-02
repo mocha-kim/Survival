@@ -15,6 +15,7 @@ MonoBehaviour:
   data:
     id: 0
     targetID: 0
+    destNPCID: 0
     currentCount: 0
     goalCount: 5
     rewardGold: 100
@@ -23,4 +24,5 @@ MonoBehaviour:
   camp: 0
   status: 1
   title: "\uD14C\uC2A4\uD2B81"
+  summary: 
   description: "0\uBC88 \uC801\uC744 5\uB9C8\uB9AC \uC7A1\uB294 \uD018\uC2A4\uD2B8"

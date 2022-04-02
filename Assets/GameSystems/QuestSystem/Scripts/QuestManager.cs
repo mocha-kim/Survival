@@ -29,28 +29,15 @@ public class QuestManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // This method dose not guarantee the correct step of status and just changes status of quest
-    public void UpdateQuestStatus(QuestObject quest, QuestStatus status)
+    private void Start()
     {
-        bool createNewItemFlag = false;
-
-        switch (status)
+        foreach (QuestObject quest in acceptedQuests.questObjects)
         {
-            case QuestStatus.None:
-            case QuestStatus.Accepted:
-                if (IsUnique(quest) && quest.status == QuestStatus.None)
-                {
-                    createNewItemFlag = true;
-                    acceptedQuests.Add(quest);
-                }
-                break;
-            case QuestStatus.Rewarded:
-                RewardQuest(quest);
-                break;
+            if (quest.type == QuestType.AcquireItem)
+            {
+                SetCurrentValue(quest, GameManager.Instance.GetTotalItemCount(quest.data.targetID));
+            }
         }
-        quest.status = status;
-
-        OnUpdateQuestStatus?.Invoke(quest, createNewItemFlag);
     }
 
     public void ProcessQuest(QuestType type, int targetId, int value)
@@ -60,6 +47,10 @@ public class QuestManager : MonoBehaviour
             if ((quest.data.targetID == targetId) && (quest.type == type))
             {
                 quest.data.currentCount += value;
+                if (quest.data.currentCount < 0)
+                {
+                    quest.data.currentCount = 0;
+                }
                 if (quest.data.currentCount == quest.data.goalCount)
                 {
                     UpdateQuestStatus(quest, QuestStatus.Completed);
@@ -73,10 +64,72 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    public void SetQuestCurValue(QuestObject quest, int value)
+    // This method dose not guarantee the correct step of status and just changes status of quest
+    public void UpdateQuestStatus(QuestObject quest, QuestStatus status)
+    {
+        switch (status)
+        {
+            case QuestStatus.None:
+                break;
+            case QuestStatus.Accepted:
+                AccepteQuest(quest);
+                break;
+            case QuestStatus.Completed:
+                CompleteQuest(quest);
+                break;
+            case QuestStatus.Rewarded:
+                RewardQuest(quest);
+                break;
+        }
+    }
+
+    private void AccepteQuest(QuestObject quest)
+    {
+        bool createNewItemFlag = false;
+
+        if (IsUnique(quest) && quest.status == QuestStatus.None)
+        {
+            createNewItemFlag = true;
+            acceptedQuests.Add(quest);
+        }
+
+        quest.status = QuestStatus.Accepted;
+        OnUpdateQuestStatus?.Invoke(quest, createNewItemFlag);
+
+        if (quest.data.currentCount >= quest.data.goalCount)
+        {
+            CompleteQuest(quest);
+        }
+    }
+
+    private void CompleteQuest(QuestObject quest)
+    {
+        quest.status = QuestStatus.Completed;
+        OnUpdateQuestStatus?.Invoke(quest, false);
+    }
+
+    private void RewardQuest(QuestObject quest)
+    {
+        if (quest.status != QuestStatus.Completed)
+        {
+            Debug.Log("This quest(" + quest + ") didn't completed");
+            return;
+        }
+        if (rewardedQuests.questObjects.FirstOrDefault(i => i == quest)) return;
+        // add gold or items to player
+
+        acceptedQuests.Remove(quest);
+        rewardedQuests.Add(quest);
+
+        quest.status = QuestStatus.Rewarded;
+
+        OnRewardedQuest?.Invoke(quest);
+    }
+
+    public void SetCurrentValue(QuestObject quest, int value)
     {
         quest.data.currentCount = value;
-        if (quest.data.currentCount == quest.data.goalCount)
+        if (quest.data.currentCount >= quest.data.goalCount)
         {
             UpdateQuestStatus(quest, QuestStatus.Completed);
         }
@@ -84,25 +137,8 @@ public class QuestManager : MonoBehaviour
         {
             UpdateQuestStatus(quest, QuestStatus.Accepted);
         }
+        
         OnUpdateQuest?.Invoke(quest);
-    }
-
-    private void RewardQuest(QuestObject quest)
-    {
-        //if (quest.status != QuestStatus.Completed)
-        //{
-        //    Debug.Log("This quest(" + quest + ") didn't completed");
-        //    return;
-        //}
-        if (rewardedQuests.questObjects.FirstOrDefault(i => i == quest))
-        {
-            return;
-        }
-        // add exp or items to player
-        OnRewardedQuest?.Invoke(quest);
-
-        acceptedQuests.Remove(quest);
-        rewardedQuests.Add(quest);
     }
 
     private bool IsUnique(QuestObject quest)

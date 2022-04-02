@@ -15,13 +15,15 @@ MonoBehaviour:
   data:
     id: 3
     targetID: 0
-    currentCount: 13
+    destNPCID: 0
+    currentCount: 9
     goalCount: 7
     rewardGold: 70
     rewardItemIds: 
   type: 1
   camp: 0
-  status: 1
+  status: 3
   title: "\uD14C\uC2A4\uD2B84"
+  summary: 
   description: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294
     \uD018\uC2A4\uD2B8"

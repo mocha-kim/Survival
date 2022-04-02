@@ -15,6 +15,4 @@ MonoBehaviour:
   questObjects:
   - {fileID: 11400000, guid: cc11d236c31cb48b98dc84a53c248eca, type: 2}
   - {fileID: 11400000, guid: 9ab33cb8af219497fb2fa5461eb3e891, type: 2}
-  - {fileID: 11400000, guid: 74a4dae406be1455dbee6dea84dfd6c6, type: 2}
-  - {fileID: 11400000, guid: 83c7c3d28156b4a09ac8126256083e02, type: 2}
   - {fileID: 11400000, guid: 2071ad79a606c48d3817d214ad9f92ff, type: 2}

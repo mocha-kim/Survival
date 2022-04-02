@@ -44,17 +44,19 @@ public class ConditionUI : MonoBehaviour
     private void UpdateConditionInfo()
     {
         activatedNum = 0;
-        foreach (Condition condition in playerStats.conditions)
+        foreach (Condition condition in playerStats.conditions.Values)
         {
             if (condition.isActive)
             {
-                slots[slotGOs[activatedNum]] = condition;
+                GameObject go = slotGOs[activatedNum];
+                slots[go] = condition;
 
-                slotGOs[activatedNum].GetComponentsInChildren<Image>()[1].sprite = condition.icon;
-                TextMeshProUGUI[] texts = slotGOs[activatedNum].GetComponentsInChildren<TextMeshProUGUI>();
-                texts[0].text = condition.type.ToString();
+                go.GetComponentInChildren<Image>().sprite = condition.icon;
+                go.GetComponentInChildren<TextMeshProUGUI>().text = condition.TypeToKorean();
+                int length = condition.TypeToKorean().Length;
+                go.GetComponentsInChildren<RectTransform>()[2].sizeDelta = new Vector2(60 * (float)length / 4, 16f);
 
-                slotGOs[activatedNum].SetActive(true);
+                go.SetActive(true);
 
                 activatedNum++;
             }

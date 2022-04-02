@@ -23,6 +23,14 @@ public class QuestListUI : Interface
     [SerializeField]
     private GameObject description;
 
+    private GameObject previousSlot = null;
+    private GameObject previousTab = null;
+    [SerializeField]
+    private Sprite[] tabBackgrounds;
+
+    [SerializeField]
+    private GameObject defaultTab;
+
     private int slotCount = 0;
 
     protected override void Awake()
@@ -39,6 +47,7 @@ public class QuestListUI : Interface
         QuestManager.Instance.OnRewardedQuest += OnRewardedQuest;
 
         CreateAllItems();
+        previousTab = defaultTab;
     }
 
     private void ResizeContent()
@@ -56,44 +65,17 @@ public class QuestListUI : Interface
 
         for (int i = 0; i < QuestManager.Instance.acceptedQuests.Count; i++)
         {
-            GameObject newItem = Instantiate(slotPrefab, slotParent.transform);
-            newItem.name += " " + slotCount;
-
-            AddEvent(newItem, EventTriggerType.PointerClick, (data) => { OnClickSlot(newItem, (PointerEventData)data); });
-
-            float y = start + (-(space + slotHeight) * slotCount);
-            newItem.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, y);
-
-            newItem.GetComponent<QuestSlotUI>().quest = QuestManager.Instance.acceptedQuests.questObjects[i];
-            newItem.GetComponent<QuestSlotUI>().UpdateTexts();
-            newItem.GetComponent<QuestSlotUI>().UpdateBackground();
-
-            slots.Add(QuestManager.Instance.acceptedQuests.questObjects[i], newItem);
-            slotCount++;
+            CreateItem(QuestManager.Instance.acceptedQuests.questObjects[i]);
         }
-
         for (int i = 0; i < QuestManager.Instance.rewardedQuests.Count; i++)
         {
-            GameObject newItem = Instantiate(slotPrefab, slotParent.transform);
-            newItem.name += " " + slotCount;
-
-            AddEvent(newItem, EventTriggerType.PointerClick, (data) => { OnClickSlot(newItem, (PointerEventData)data); });
-
-            float y = start + (-(space + slotHeight) * slotCount);
-            newItem.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, y);
-
-            newItem.GetComponent<QuestSlotUI>().quest = QuestManager.Instance.rewardedQuests.questObjects[i];
-            newItem.GetComponent<QuestSlotUI>().UpdateTexts();
-            newItem.GetComponent<QuestSlotUI>().UpdateBackground();
-
-            slots.Add(QuestManager.Instance.rewardedQuests.questObjects[i], newItem);
-            slotCount++;
+            CreateItem(QuestManager.Instance.rewardedQuests.questObjects[i]);
         }
 
         ResizeContent();
     }
 
-    private void CreateAcceptedItem(QuestObject quest)
+    private void CreateItem(QuestObject quest)
     {
         GameObject newItem = Instantiate(slotPrefab, slotParent.transform);
         newItem.name += " " + slotCount;
@@ -105,29 +87,26 @@ public class QuestListUI : Interface
 
         newItem.GetComponent<QuestSlotUI>().quest = quest;
         newItem.GetComponent<QuestSlotUI>().UpdateTexts();
+        newItem.GetComponent<QuestSlotUI>().UpdateSlotStyle();
 
         slots.Add(quest, newItem);
         slotCount++;
-
-        ResizeContent();
-        RefreshAllItemsTransform();
     }
 
     public void OnUpdateQuestStatus(QuestObject quest, bool flag)
     {
         if (flag)
         {
-            CreateAcceptedItem(quest);
-        }
+            CreateItem(quest);
 
-        slots[quest]?.GetComponent<QuestSlotUI>().UpdateBackground();
+            ResizeContent();
+            RefreshAllItemsTransform();
+        }
     }
 
     public void OnRewardedQuest(QuestObject quest)
     {
         GameObject go = slots[quest];
-
-        go.GetComponent<QuestSlotUI>().UpdateBackground();
 
         go.transform.SetAsLastSibling();
         RefreshAllItemsTransform();
@@ -137,12 +116,24 @@ public class QuestListUI : Interface
     {
         int count = 0;
 
-        foreach (KeyValuePair<QuestObject, GameObject> pair in slots)
+        foreach (QuestObject quest in QuestManager.Instance.acceptedQuests.questObjects)
         {
-            if (pair.Value.activeSelf)
+            GameObject go = slots[quest];
+            if (go.activeSelf)
             {
                 float y = start + (-(space + slotHeight) * count);
-                pair.Value.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, y);
+                go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, y);
+
+                count++;
+            }
+        }
+        foreach (QuestObject quest in QuestManager.Instance.rewardedQuests.questObjects)
+        {
+            GameObject go = slots[quest];
+            if (go.activeSelf)
+            {
+                float y = start + (-(space + slotHeight) * count);
+                go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, y);
 
                 count++;
             }
@@ -172,7 +163,7 @@ public class QuestListUI : Interface
         foreach (KeyValuePair<QuestObject, GameObject> pair in slots)
         {
             pair.Value.SetActive(false);
-            if (pair.Key.camp != camp)
+            if (pair.Key.camp == camp)
             {
                 pair.Value.SetActive(true);
                 slotCount++;
@@ -190,16 +181,6 @@ public class QuestListUI : Interface
         texts[1].text = quest.description;
     }
 
-    private void EnableDescription()
-    {
-        description.SetActive(true);
-    }
-
-    private void DisableDescription()
-    {
-        description.SetActive(false);
-    }
-
     private void OnClickSlot(GameObject go, PointerEventData data)
     {
         OnClickInterface();
@@ -210,27 +191,72 @@ public class QuestListUI : Interface
             return;
         }
 
-        EnableDescription();
+        if (previousSlot && (previousSlot == go))
+        {
+            description.SetActive(false);
+            previousSlot = null;
+            return;
+        }
+
+        description.SetActive(true);
         UpdateDescriptions(slot);
+
+        previousSlot = go;
     }
 
-    public void OnClickLawfulCamp()
+    public void OnClickAllCamp(GameObject button)
     {
+        if (button == previousTab) return;
+
+        if (previousTab)
+        {
+            previousTab.GetComponent<Image>().sprite = tabBackgrounds[0];
+        }
+        button.GetComponent<Image>().sprite = tabBackgrounds[1];
+        previousTab = button;
+
+        ShowAllItems();
+    }
+
+    public void OnClickLawfulCamp(GameObject button)
+    {
+        if (button == previousTab) return;
+
+        if (previousTab)
+        {
+            previousTab.GetComponent<Image>().sprite = tabBackgrounds[0];
+        }
+        button.GetComponent<Image>().sprite = tabBackgrounds[1];
+        previousTab = button;
+
         ShowFilteredItems(QuestCampType.Lawful);
     }
 
-    public void OnClickNeutralCamp()
+    public void OnClickNeutralCamp(GameObject button)
     {
+        if (button == previousTab) return;
+
+        if (previousTab)
+        {
+            previousTab.GetComponent<Image>().sprite = tabBackgrounds[0];
+        }
+        button.GetComponent<Image>().sprite = tabBackgrounds[1];
+        previousTab = button;
+
         ShowFilteredItems(QuestCampType.Neutral);
     }
 
-    public void OnClickChaoticCamp()
+    public void OnClickChaoticCamp(GameObject button)
     {
-        ShowFilteredItems(QuestCampType.Chaotic);
-    }
+        if (button == previousTab) return;
 
-    public void OnClickAllCamp()
-    {
-        ShowAllItems();
+        if (previousTab)
+        {
+            previousTab.GetComponent<Image>().sprite = tabBackgrounds[0];
+        }
+        button.GetComponent<Image>().sprite = tabBackgrounds[1];
+        previousTab = button;
+
+        ShowFilteredItems(QuestCampType.Chaotic);
     }
 }

@@ -52,12 +52,12 @@ public class CharacterStatsUI : Interface
     private void Update()
     {
         GameObject slot;
-        for (int i = 0; i < playerStats.conditions.Length; i++)
+        for (int i = 0; i < playerStats.conditions.Count; i++)
         {
-            if (playerStats.conditions[i].isActive)
+            if (playerStats.conditions[(ConditionType)i].isActive)
             {
                 slot = conditionArea.transform.GetChild(i).gameObject;
-                slot.GetComponentInChildren<TextMeshProUGUI>().text = playerStats.conditions[i].DisplayTime.ToString("n0");
+                slot.GetComponentInChildren<TextMeshProUGUI>().text = playerStats.conditions[(ConditionType)i].DisplayTime.ToString("n0");
             }
         }
     }
@@ -71,9 +71,9 @@ public class CharacterStatsUI : Interface
     public void OnConditionChanged(StatsObject obj, Condition condition)
     {
         int index = -1;
-        for (int i = 0; i < obj.conditions.Length; i++)
+        for (int i = 0; i < obj.conditions.Count; i++)
         {
-            if (obj.conditions[i].type == condition.type)
+            if (obj.conditions[(ConditionType)i].type == condition.type)
             {
                 index = i;
                 break;
@@ -90,11 +90,14 @@ public class CharacterStatsUI : Interface
     private void InitConditionSlots()
     {
         GameObject slot;
-        for (int i = 0; i < playerStats.conditions.Length; i++)
+        int index = 0;
+
+        foreach (Condition condition in playerStats.conditions.Values)
         {
-            slot = conditionArea.transform.GetChild(i).gameObject;
-            slot.GetComponentsInChildren<Image>()[1].sprite = playerStats.conditions[i].icon;
-            UpdataConditionSlot(slot, playerStats.conditions[i]);
+            slot = conditionArea.transform.GetChild(index).gameObject;
+            slot.GetComponentsInChildren<Image>()[1].sprite = condition.icon;
+            UpdataConditionSlot(slot, condition);
+            index++;
         }
     }
 
@@ -108,8 +111,8 @@ public class CharacterStatsUI : Interface
     {
         for (int i = 0; i < 4; i++)
         {
-            statusTexts[i].text = playerStats.statuses[i].currentValue.ToString();
-            statusTexts[i + 4].text = playerStats.statuses[i].maxValue.ToString();
+            statusTexts[i].text = playerStats.statuses[(StatusType)i].currentValue.ToString();
+            statusTexts[i + 4].text = playerStats.statuses[(StatusType)i].maxValue.ToString();
         }
     }
 
@@ -119,12 +122,12 @@ public class CharacterStatsUI : Interface
         int bValue;
         for (int i = 0; i < 3; i++)
         {
-            mValue = playerStats.attributes[i].modifiedValue;
-            bValue = playerStats.attributes[i].baseValue;
+            mValue = playerStats.attributes[(AttributeType)i].modifiedValue;
+            bValue = playerStats.attributes[(AttributeType)i].baseValue;
             attributeTexts[i].text = mValue.ToString();
             attributeTexts[i + 3].text = "( " + bValue.ToString() + " + " + (mValue - bValue).ToString() + " )";
         }
-        sliders[0].value = playerStats.attributes[3].modifiedValue;
-        sliders[1].value = playerStats.attributes[4].modifiedValue;
+        sliders[0].value = playerStats.attributes[AttributeType.Handiness].modifiedValue;
+        sliders[1].value = playerStats.attributes[AttributeType.Cooking].modifiedValue;
     }
 }

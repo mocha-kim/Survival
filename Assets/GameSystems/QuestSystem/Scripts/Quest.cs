@@ -5,6 +5,7 @@ public class Quest
 {
     public int id;
     public int targetID;
+    public int destNPCID;
 
     public int currentCount;
     public int goalCount;

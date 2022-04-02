@@ -10,18 +10,18 @@ using UnityEngine.AI;
 
 public enum State
 {
-    idle,
-    trace1,
-    trace2,
-    attack,
-    hit,
-    dead,
+    Idle,
+    Trace1,
+    Trace2,
+    Attack,
+    Hit,
+    Dead,
 };
 
 public class EnemyController : MonoBehaviour
 {
     // State
-    private State state = State.idle;
+    private State state = State.Idle;
 
     // Component
     [SerializeField]
@@ -65,7 +65,7 @@ public class EnemyController : MonoBehaviour
             if (distance <= attackDistance && !isDelay) // 1.0f
             {
                 isDelay = true;
-                state = State.attack;
+                state = State.Attack;
                 CheckStateForAction();
                 StartCoroutine(Delay(attackDelay));
             }
@@ -74,7 +74,7 @@ public class EnemyController : MonoBehaviour
             {
                 if (fieldOfView.canSeePlayer == true)
                 {
-                    state = State.trace1;
+                    state = State.Trace1;
                     CheckStateForAction();
                 }
                 // else if(isTrack == true)                state = State.trace2;
@@ -82,7 +82,7 @@ public class EnemyController : MonoBehaviour
 
             if (distance > traceDistance)
             {
-                state = State.idle;
+                state = State.Idle;
                 CheckStateForAction();
             }
 
@@ -94,12 +94,12 @@ public class EnemyController : MonoBehaviour
     {
         switch (state)
         {
-            case State.idle:
+            case State.Idle:
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
                 break;
 
-            case State.trace1:
+            case State.Trace1:
                 navMeshAgent.isStopped = false;
                 targetLastPosition = target.transform.position;
                 navMeshAgent.destination = targetLastPosition;
@@ -120,7 +120,7 @@ public class EnemyController : MonoBehaviour
                 break;
                 */
 
-            case State.attack:
+            case State.Attack:
                 navMeshAgent.isStopped = true;
                 animator.SetTrigger("onAttack");
                 break;

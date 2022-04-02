@@ -19,9 +19,10 @@ public class ItemPocketUI : DynamicInventoryUI
         descriptionLength = description.GetComponent<RectTransform>().sizeDelta.y;
 
         ResizeContent();
-        ResizeViewport();
+        //ResizeViewport();
     }
 
+    /*
     private void ResizeViewport()
     {
         // calc lengthes to resize viewport area
@@ -30,6 +31,7 @@ public class ItemPocketUI : DynamicInventoryUI
 
         viewport.GetComponent<RectTransform>().sizeDelta = new Vector2(0, tempLength);
     }
+    */
 
     private void ResizeContent()
     {
@@ -42,12 +44,10 @@ public class ItemPocketUI : DynamicInventoryUI
     protected override void EnableDescription()
     {
         base.EnableDescription();
-        ResizeViewport();
     }
 
     protected override void DisableDescription()
     {
         base.DisableDescription();
-        ResizeViewport();
     }
 }

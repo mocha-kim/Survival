@@ -27,16 +27,16 @@ public class DebugUI : MonoBehaviour
 
     private void UpdateValueTexts()
     {
-        valueTexts[0].text = (playerStat.statuses[0].currentValue).ToString() + "/" + (playerStat.statuses[0].maxValue).ToString();
-        valueTexts[1].text = (playerStat.statuses[1].currentValue).ToString() + "/" + (playerStat.statuses[1].maxValue).ToString();
-        valueTexts[2].text = (playerStat.statuses[2].currentValue).ToString() + "/" + (playerStat.statuses[2].maxValue).ToString();
-        valueTexts[3].text = (playerStat.statuses[3].currentValue).ToString() + "/" + (playerStat.statuses[3].maxValue).ToString();
+        valueTexts[0].text = (playerStat.statuses[(StatusType)0].currentValue).ToString() + "/" + (playerStat.statuses[(StatusType)0].maxValue).ToString();
+        valueTexts[1].text = (playerStat.statuses[(StatusType)1].currentValue).ToString() + "/" + (playerStat.statuses[(StatusType)1].maxValue).ToString();
+        valueTexts[2].text = (playerStat.statuses[(StatusType)2].currentValue).ToString() + "/" + (playerStat.statuses[(StatusType)2].maxValue).ToString();
+        valueTexts[3].text = (playerStat.statuses[(StatusType)3].currentValue).ToString() + "/" + (playerStat.statuses[(StatusType)3].maxValue).ToString();
 
-        valueTexts[4].text = playerStat.attributes[0].modifiedValue.ToString();
-        valueTexts[5].text = playerStat.attributes[1].modifiedValue.ToString();
-        valueTexts[6].text = playerStat.attributes[2].modifiedValue.ToString();
-        valueTexts[7].text = playerStat.attributes[3].modifiedValue.ToString();
-        valueTexts[8].text = playerStat.attributes[4].modifiedValue.ToString();
+        valueTexts[4].text = playerStat.attributes[(AttributeType)0].modifiedValue.ToString();
+        valueTexts[5].text = playerStat.attributes[(AttributeType)1].modifiedValue.ToString();
+        valueTexts[6].text = playerStat.attributes[(AttributeType)2].modifiedValue.ToString();
+        valueTexts[7].text = playerStat.attributes[(AttributeType)3].modifiedValue.ToString();
+        valueTexts[8].text = playerStat.attributes[(AttributeType)4].modifiedValue.ToString();
     }
 
     private void InitConditionTypes()
@@ -91,7 +91,7 @@ public class DebugUI : MonoBehaviour
 
     public void OnClickAdd()
     {
-        foreach (Condition condition in playerStat.conditions)
+        foreach (Condition condition in playerStat.conditions.Values)
         {
             if (condition.type == (ConditionType)dropdown.value)
             {

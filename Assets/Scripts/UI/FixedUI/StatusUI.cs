@@ -15,10 +15,10 @@ public class StatusUI : MonoBehaviour
 
     void Start()
     {
-        healthSlider.value = playerStats.statuses[(int)StatusType.HP].Percentage;
-        staminaSlider.value = playerStats.statuses[(int)StatusType.SP].Percentage;
-        hungerSlider.value = playerStats.statuses[(int)StatusType.Hunger].Percentage;
-        thirstSlider.value = playerStats.statuses[(int)StatusType.Thirst].Percentage;
+        healthSlider.value = playerStats.statuses[StatusType.HP].Percentage;
+        staminaSlider.value = playerStats.statuses[StatusType.SP].Percentage;
+        hungerSlider.value = playerStats.statuses[StatusType.Hunger].Percentage;
+        thirstSlider.value = playerStats.statuses[StatusType.Thirst].Percentage;
     }
 
     private void OnEnable()
@@ -33,9 +33,9 @@ public class StatusUI : MonoBehaviour
 
     private void OnStatChanged(StatsObject obj)
     {
-        healthSlider.value = playerStats.statuses[(int)StatusType.HP].Percentage;
-        staminaSlider.value = playerStats.statuses[(int)StatusType.SP].Percentage;
-        hungerSlider.value = playerStats.statuses[(int)StatusType.Hunger].Percentage;
-        thirstSlider.value = playerStats.statuses[(int)StatusType.Thirst].Percentage;
+        healthSlider.value = playerStats.statuses[StatusType.HP].Percentage;
+        staminaSlider.value = playerStats.statuses[StatusType.SP].Percentage;
+        hungerSlider.value = playerStats.statuses[StatusType.Hunger].Percentage;
+        thirstSlider.value = playerStats.statuses[StatusType.Thirst].Percentage;
     }
 }

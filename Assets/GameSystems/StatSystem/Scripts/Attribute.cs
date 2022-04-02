@@ -18,4 +18,12 @@ public class Attribute
     public int modifiedValue;
     public int baseValue;
     public float exp;
+
+    public Attribute(AttributeType type, int baseValue)
+    {
+        this.type = type;
+        this.baseValue = baseValue;
+        modifiedValue = baseValue;
+        exp = 0f;
+    }
 }
