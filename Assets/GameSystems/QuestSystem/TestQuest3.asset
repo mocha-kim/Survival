@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: TestQuest3
   m_EditorClassIdentifier: 
   data:
-    id: 2
+    id: 0
     targetID: 0
     destNPCID: 0
     currentCount: 10
     goalCount: 10
     rewardGold: 100
     rewardItemIds: 
+    rewardItemCounts: 
   type: 1
   camp: 2
   status: 3

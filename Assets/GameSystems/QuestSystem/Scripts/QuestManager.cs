@@ -64,9 +64,10 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // This method dose not guarantee the correct step of status and just changes status of quest
-    public void UpdateQuestStatus(QuestObject quest, QuestStatus status)
+    // This method dose not guarantee the correct step of status. This just changes status of quest
+    public bool UpdateQuestStatus(QuestObject quest, QuestStatus status)
     {
+        bool rewardResult = true;
         switch (status)
         {
             case QuestStatus.None:
@@ -78,9 +79,10 @@ public class QuestManager : MonoBehaviour
                 CompleteQuest(quest);
                 break;
             case QuestStatus.Rewarded:
-                RewardQuest(quest);
+                rewardResult = RewardQuest(quest);
                 break;
         }
+        return rewardResult;
     }
 
     private void AccepteQuest(QuestObject quest)
@@ -108,15 +110,46 @@ public class QuestManager : MonoBehaviour
         OnUpdateQuestStatus?.Invoke(quest, false);
     }
 
-    private void RewardQuest(QuestObject quest)
+    private bool RewardQuest(QuestObject quest)
     {
         if (quest.status != QuestStatus.Completed)
         {
             Debug.Log("This quest(" + quest + ") didn't completed");
-            return;
+            return false;
         }
-        if (rewardedQuests.questObjects.FirstOrDefault(i => i == quest)) return;
+        if (rewardedQuests.questObjects.FirstOrDefault(i => i == quest))
+        {
+            Debug.Log("This quest(" + quest + ") already rewarded");
+            return false;
+        }
+
         // add gold or items to player
+        InventoryObject inventory = GameManager.Instance.inventory;
+        int requiredSlotCount = 0;
+        for (int i = 0; i < quest.data.rewardItemIds.Length; i++)
+        {
+            if (GameManager.Instance.IsItemStackable(quest.data.rewardItemIds[i]))
+            {
+                if (!inventory.IsContain(quest.data.rewardItemIds[i]))
+                {
+                    requiredSlotCount++;
+                }
+            }
+            else
+            {
+                requiredSlotCount++;
+            }
+        }
+        if (inventory.EmptySlotCount < requiredSlotCount)
+        {
+            Debug.Log("Player does not have enough inventory space");
+            return false;
+        }
+
+        for (int i = 0; i < quest.data.rewardItemIds.Length; i++)
+        {
+            inventory.AddItem(quest.data.rewardItemIds[i], quest.data.rewardItemCounts[i]);
+        }
 
         acceptedQuests.Remove(quest);
         rewardedQuests.Add(quest);
@@ -124,6 +157,7 @@ public class QuestManager : MonoBehaviour
         quest.status = QuestStatus.Rewarded;
 
         OnRewardedQuest?.Invoke(quest);
+        return true;
     }
 
     public void SetCurrentValue(QuestObject quest, int value)

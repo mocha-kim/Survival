@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class Quest
@@ -12,6 +13,7 @@ public class Quest
 
     public int rewardGold;
     public int[] rewardItemIds;
+    public int[] rewardItemCounts;
 
     public Quest()
     {

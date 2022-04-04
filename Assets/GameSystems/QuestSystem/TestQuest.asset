@@ -20,6 +20,7 @@ MonoBehaviour:
     goalCount: 5
     rewardGold: 100
     rewardItemIds: 
+    rewardItemCounts: 
   type: 0
   camp: 0
   status: 1

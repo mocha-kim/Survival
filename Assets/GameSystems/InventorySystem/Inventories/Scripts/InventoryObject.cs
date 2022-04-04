@@ -30,15 +30,9 @@ public class InventoryObject : ScriptableObject
         }
     }
 
-    public InventorySlot GetItemSlot(Item item)
-    {
-        return Slots.FirstOrDefault(i => i.item.id == item.id);
-    }
-
-    public InventorySlot GetEmptySlot()
-    {
-        return Slots.FirstOrDefault(i => i.item.id == -1);
-    }
+    public InventorySlot GetItemSlot(Item item) => Slots.FirstOrDefault(i => i.item.id == item.id);
+    public InventorySlot GetItemSlot(int id) => Slots.FirstOrDefault(i => i.item.id == id);
+    public InventorySlot GetEmptySlot() => Slots.FirstOrDefault(i => i.item.id == -1);
 
     public bool AddItem(Item item, int amount)
     {
@@ -61,15 +55,14 @@ public class InventoryObject : ScriptableObject
         return true;
     }
 
-    public bool IsContain(ItemObject itemObject)
+    public bool AddItem(int id, int amount)
     {
-        return Slots.FirstOrDefault(i => i.item.id == itemObject.data.id) != null;
+        Item item = database.itemObjects.FirstOrDefault(i => i.data.id == id).data;
+        return AddItem(item, amount);
     }
 
-    public bool IsContain(int id)
-    {
-        return Slots.FirstOrDefault(i => i.item.id == id) != null;
-    }
+    public bool IsContain(ItemObject itemObject) => Slots.FirstOrDefault(i => i.item.id == itemObject.data.id) != null;
+    public bool IsContain(int id) => Slots.FirstOrDefault(i => i.item.id == id) != null;
 
     public int CountItem(int id)
     {

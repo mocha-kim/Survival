@@ -17,11 +17,11 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a2f0a6ec7eada2d4daa504b62e26bd01, type: 3}
   data:
     id: 1
-    name: Baseball Bat
+    name: "\uC57C\uAD6C\uBC29\uB9DD\uC774"
     effects:
     - type: 1
       statusType: 0
       attributeType: 1
       conditionType: 0
       value: 2
-  description: A pretty strong baseball bat.
+  description: "\uAF64 \uB2E8\uB2E8\uD55C \uC57C\uAD6C\uBC29\uB9DD\uC774"

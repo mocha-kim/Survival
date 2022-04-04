@@ -57,9 +57,12 @@ public class GameManager : MonoBehaviour
     }
 
     public string GetItemName(int id) => itemDatabase.itemObjects.FirstOrDefault(i => i.data.id == id)?.data.name;
+    public bool IsItemStackable(int itemId) => itemDatabase.itemObjects.FirstOrDefault(i => i.data.id == itemId).isStackable;
+
     public string GetEnemyName(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id)?.name;
     public Enemy GetEnemyData(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id);
     public Enemy GetEnemyData(string name) => enemyDatabase.datas.FirstOrDefault(i => i.name == name);
+
 
     public int GetTotalItemCount(int id)
     {

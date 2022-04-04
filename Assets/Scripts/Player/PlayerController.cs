@@ -39,11 +39,8 @@ public class PlayerController : MonoBehaviour
     private float attackDelay = 1.1335f;
 
     // Game system objects
-    [SerializeField]
     private StatsObject playerStat;
-    [SerializeField]
     private InventoryObject inventory;
-    [SerializeField]
     private InventoryObject quickslot;
 
     private void Awake()
@@ -54,15 +51,20 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        playerStat = GameManager.Instance.playerStats;
+        inventory = GameManager.Instance.inventory;
+        quickslot = GameManager.Instance.quickslot;
+
         inventory.OnUseItem += OnUseItem;
         quickslot.OnUseItem += OnUseItem;
 
         playerStat.OnStatChanged += OnStatChanged;
+        QuestManager.Instance.OnRewardedQuest += OnRewardedQuest;
     }
 
     private void Update()
     {
-        if (GameManager.Instance.IsGamePlaying && (playerStat.statuses[StatusType.HP].currentValue > 0))
+        if (GameManager.Instance.IsGamePlaying && !playerStat.IsDead)
         {
             // Gravity : Check player is not grounded
             if (characterController.isGrounded == false)
@@ -198,4 +200,21 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    private void OnRewardedQuest(QuestObject quest)
+    {
+        switch (quest.camp)
+        {
+            case QuestCampType.Lawful:
+                playerStat.lawfulCoin += quest.data.rewardGold;
+                break;
+            case QuestCampType.Neutral:
+                playerStat.neutralCoin += quest.data.rewardGold;
+                break;
+            case QuestCampType.Chaotic:
+                playerStat.chaoticCoin += quest.data.rewardGold;
+                break;
+        }
+    }
+
 }

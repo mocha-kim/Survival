@@ -11,7 +11,13 @@ public class StatsObject : ScriptableObject
 
     public Action<StatsObject> OnStatChanged;
     public Action<StatsObject, Condition> OnConditionChanged;
+
+    public float lawfulCoin;
+    public float neutralCoin;
+    public float chaoticCoin;
+
     public bool isInitialized = false;
+    public bool IsDead => statuses[StatusType.HP].currentValue <= 0;
 
     public int CountActivatedConditions
     {
