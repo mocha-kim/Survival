@@ -110,14 +110,15 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-/[Aa]ssets/[Aa]nimateController/
-/[Aa]ssets/[Aa]nimation/
-/[Aa]ssets/[Dd]ownloadedAsset/
-/[Aa]ssets/[Mm]odel/
-/[Aa]ssets/[Pp]refabs/
-/[Aa]ssets/[Ss]cenes/
-/[Aa]ssets/[Ss]prites/
-/[Aa]ssets/[Tt]ext[Mm]esh [Pp]ro/
+/[Aa]ssets/AnimateController/
+/[Aa]ssets/Animation/
+/[Aa]ssets/AudioClips/
+/[Aa]ssets/DownloadedAsset/
+/[Aa]ssets/Model/
+/[Aa]ssets/Prefabs/
+/[Aa]ssets/Scenes/
+/[Aa]ssets/Sprites/
+/[Aa]ssets/TextMesh Pro/
 
 ### Windows ###
 # Windows thumbnail cache files
