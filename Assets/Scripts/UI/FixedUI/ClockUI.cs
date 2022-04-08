@@ -21,8 +21,8 @@ public class ClockUI : MonoBehaviour
     private int maxValue = 12;
     private int calcValue;
 
-    private float TimeLeft => TimeManager.Instance.timeLeft;
-    private bool IsDaytime => TimeManager.Instance.isDaytime;
+    private float TimeLeft => TimeManager.Instance.GetTimeLeft();
+    private bool IsDaytime => TimeManager.Instance.GetIsDaytime();
 
     private void Start()
     {
@@ -39,7 +39,7 @@ public class ClockUI : MonoBehaviour
 
     private void Update()
     {
-        calcValue = (int)Mathf.Ceil(TimeLeft / (float)TimeManager.Instance.realtimePerHour);
+        calcValue = (int)Mathf.Ceil(TimeLeft / (float)TimeManager.Instance.GetRealtimePerHour());
         if (clock.value > calcValue)
         {
             clock.value = calcValue;
@@ -50,7 +50,7 @@ public class ClockUI : MonoBehaviour
     {
         fill.color = IsDaytime ? fillColors[0] : fillColors[1];
         dayText.color = IsDaytime ? textColors[0] : textColors[1];
-        dayText.text = "DAY " + TimeManager.Instance.day;
+        dayText.text = "DAY " + TimeManager.Instance.GetDay();
         calcValue = maxValue;
         clock.value = maxValue;
     }

@@ -8,9 +8,7 @@ public class QuestManager : MonoBehaviour
     public static QuestManager Instance => instance;
 
     public QuestDatabase questDatabase;
-
-    public QuestDatabase acceptedQuests;
-    public QuestDatabase rewardedQuests;
+    public QuestDataContainer playerQuests;
 
     public event Action<QuestObject, bool> OnUpdateQuestStatus;
     public event Action<QuestObject> OnUpdateQuest;
@@ -31,7 +29,7 @@ public class QuestManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (QuestObject quest in acceptedQuests.questObjects)
+        foreach (QuestObject quest in playerQuests.acceptedQuests)
         {
             if (quest.type == QuestType.AcquireItem)
             {
@@ -42,7 +40,7 @@ public class QuestManager : MonoBehaviour
 
     public void ProcessQuest(QuestType type, int targetId, int value)
     {
-        foreach (QuestObject quest in acceptedQuests.questObjects)
+        foreach (QuestObject quest in playerQuests.acceptedQuests)
         {
             if ((quest.data.targetID == targetId) && (quest.type == type))
             {
@@ -68,6 +66,7 @@ public class QuestManager : MonoBehaviour
     public bool UpdateQuestStatus(QuestObject quest, QuestStatus status)
     {
         bool rewardResult = true;
+        if (quest.status == status) return false;
         switch (status)
         {
             case QuestStatus.None:
@@ -92,7 +91,7 @@ public class QuestManager : MonoBehaviour
         if (IsUnique(quest) && quest.status == QuestStatus.None)
         {
             createNewItemFlag = true;
-            acceptedQuests.Add(quest);
+            playerQuests.acceptedQuests.Add(quest);
         }
 
         quest.status = QuestStatus.Accepted;
@@ -117,7 +116,7 @@ public class QuestManager : MonoBehaviour
             Debug.Log("This quest(" + quest + ") didn't completed");
             return false;
         }
-        if (rewardedQuests.questObjects.FirstOrDefault(i => i == quest))
+        if (playerQuests.rewardedQuests.FirstOrDefault(i => i == quest))
         {
             Debug.Log("This quest(" + quest + ") already rewarded");
             return false;
@@ -151,8 +150,8 @@ public class QuestManager : MonoBehaviour
             inventory.AddItem(quest.data.rewardItemIds[i], quest.data.rewardItemCounts[i]);
         }
 
-        acceptedQuests.Remove(quest);
-        rewardedQuests.Add(quest);
+        playerQuests.acceptedQuests.Remove(quest);
+        playerQuests.rewardedQuests.Add(quest);
 
         quest.status = QuestStatus.Rewarded;
 
@@ -177,8 +176,8 @@ public class QuestManager : MonoBehaviour
 
     private bool IsUnique(QuestObject quest)
     {
-        if (acceptedQuests.questObjects.FirstOrDefault(i => i == quest)
-            || rewardedQuests.questObjects.FirstOrDefault(i => i == quest))
+        if (playerQuests.acceptedQuests.FirstOrDefault(i => i == quest)
+            || playerQuests.rewardedQuests.FirstOrDefault(i => i == quest))
         {
             return false;
         }

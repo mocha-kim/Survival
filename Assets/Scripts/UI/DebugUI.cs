@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class DebugUI : MonoBehaviour
@@ -11,9 +12,9 @@ public class DebugUI : MonoBehaviour
 
     public TextMeshProUGUI[] valueTexts;
     public TMP_Dropdown dropdown;
+    public Toggle toggle;
     public TMP_InputField input;
 
-    public QuestObject[] testQuests;
     private int acceptIdx = 0;
     private int rewardIdx = 0;
 
@@ -57,36 +58,75 @@ public class DebugUI : MonoBehaviour
 
     public void OnClickSUp()
     {
-        playerStat.AddStatusValue(StatusType.HP, 10);
-        playerStat.AddStatusValue(StatusType.SP, 10);
-        playerStat.AddStatusValue(StatusType.Hunger, 10);
-        playerStat.AddStatusValue(StatusType.Thirst, 10);
+        playerStat.AddStatusCurrentValue(StatusType.HP, 10);
+        playerStat.AddStatusCurrentValue(StatusType.SP, 10);
+        playerStat.AddStatusCurrentValue(StatusType.Hunger, 10);
+        playerStat.AddStatusCurrentValue(StatusType.Thirst, 10);
     }
 
     public void OnClickSDown()
     {
-        playerStat.AddStatusValue(StatusType.HP, -10);
-        playerStat.AddStatusValue(StatusType.SP, -10);
-        playerStat.AddStatusValue(StatusType.Hunger, -10);
-        playerStat.AddStatusValue(StatusType.Thirst, -10);
+        playerStat.AddStatusCurrentValue(StatusType.HP, -10);
+        playerStat.AddStatusCurrentValue(StatusType.SP, -10);
+        playerStat.AddStatusCurrentValue(StatusType.Hunger, -10);
+        playerStat.AddStatusCurrentValue(StatusType.Thirst, -10);
     }
 
-    public void OnClickAUp()
+    public void OnClickAMUp()
     {
-        playerStat.AddAttributeValue(AttributeType.CON, 1);
-        playerStat.AddAttributeValue(AttributeType.STR, 1);
-        playerStat.AddAttributeValue(AttributeType.DEF, 1);
-        playerStat.AddAttributeValue(AttributeType.Handiness, 1);
-        playerStat.AddAttributeValue(AttributeType.Cooking, 1);
+        playerStat.AddAttributeModifiedValue(AttributeType.CON, 1);
+        playerStat.AddAttributeModifiedValue(AttributeType.STR, 1);
+        playerStat.AddAttributeModifiedValue(AttributeType.DEF, 1);
     }
 
-    public void OnClickADown()
+    public void OnClickAMDown()
     {
-        playerStat.AddAttributeValue(AttributeType.CON, -1);
-        playerStat.AddAttributeValue(AttributeType.STR, -1);
-        playerStat.AddAttributeValue(AttributeType.DEF, -1);
-        playerStat.AddAttributeValue(AttributeType.Handiness, -1);
-        playerStat.AddAttributeValue(AttributeType.Cooking, -1);
+        playerStat.AddAttributeModifiedValue(AttributeType.CON, -1);
+        playerStat.AddAttributeModifiedValue(AttributeType.STR, -1);
+        playerStat.AddAttributeModifiedValue(AttributeType.DEF, -1);
+    }
+
+    public void OnClickABUp()
+    {
+        playerStat.AddAttributeBaseValue(AttributeType.CON, 1);
+        playerStat.AddAttributeBaseValue(AttributeType.STR, 1);
+        playerStat.AddAttributeBaseValue(AttributeType.DEF, 1);
+        playerStat.AddAttributeBaseValue(AttributeType.Handiness, 1);
+        playerStat.AddAttributeBaseValue(AttributeType.Cooking, 1);
+    }
+
+    public void OnClickAExpUp()
+    {
+        playerStat.AddAttributeExp(AttributeType.CON, 10);
+        playerStat.AddAttributeExp(AttributeType.STR, 10);
+        playerStat.AddAttributeExp(AttributeType.DEF, 10);
+        playerStat.AddAttributeExp(AttributeType.Handiness, 10);
+        playerStat.AddAttributeExp(AttributeType.Cooking, 10);
+    }
+
+    public void OnClickResetStats()
+    {
+        for (StatusType type = StatusType.HP; type <= StatusType.Thirst; type++)
+        {
+            playerStat.statuses[type].maxValue = 100;
+            playerStat.statuses[type].currentValue = 100;
+        }
+        for (AttributeType type = AttributeType.CON; type <= AttributeType.DEF; type++)
+        {
+            playerStat.attributes[type].baseValue = 10;
+            playerStat.attributes[type].modifiedValue = 10;
+            playerStat.attributes[type].exp = 0;
+        }
+        for (AttributeType type = AttributeType.Handiness; type <= AttributeType.Cooking; type++)
+        {
+            playerStat.attributes[type].baseValue = 1;
+            playerStat.attributes[type].modifiedValue = 1;
+            playerStat.attributes[type].exp = 0;
+        }
+        for (ConditionType type = ConditionType.SwallowWound; type <= ConditionType.MentalBreakdown; type++)
+        {
+            playerStat.DeactivateCondition(type);
+        }
     }
 
     public void OnClickAdd()
@@ -95,7 +135,11 @@ public class DebugUI : MonoBehaviour
         {
             if (condition.type == (ConditionType)dropdown.value)
             {
-                if (float.TryParse(input.text, out float inputNum))
+                if (toggle.isOn)
+                {
+                    playerStat.ActivateCondition(condition);
+                }
+                else if (float.TryParse(input.text, out float inputNum))
                 {
                     playerStat.ActivateCondition(condition, inputNum);
                 }
@@ -104,9 +148,23 @@ public class DebugUI : MonoBehaviour
         }
     }
 
-    public void OnClickBatBtn()
+    public void OnClickSub()
     {
-        playerInventory.AddItem(database.GetItem(1), 1);
+        foreach (Condition condition in playerStat.conditions.Values)
+        {
+            if (condition.type == (ConditionType)dropdown.value)
+            {
+                if (!toggle.isOn)
+                {
+                    playerStat.DeactivateCondition(condition);
+                }
+                else if (float.TryParse(input.text, out float inputNum))
+                {
+                    playerStat.ActivateCondition(condition, -inputNum);
+                }
+                return;
+            }
+        }
     }
 
     public void OnClickPotatoBtn()
@@ -114,23 +172,33 @@ public class DebugUI : MonoBehaviour
         playerInventory.AddItem(database.GetItem(0), 1);
     }
 
+    public void OnClickBatBtn()
+    {
+        playerInventory.AddItem(database.GetItem(1), 1);
+    }
+
+    public void OnClickCookbookBtn()
+    {
+        playerInventory.AddItem(database.GetItem(2), 1);
+    }
+
     public void OnClickAcceptBtn()
     {
-        if (acceptIdx >= testQuests.Length)
+        if (acceptIdx >= QuestManager.Instance.questDatabase.data.Length)
         {
             return;
         }
-        QuestManager.Instance.UpdateQuestStatus(testQuests[acceptIdx], QuestStatus.Accepted);
+        QuestManager.Instance.UpdateQuestStatus(QuestManager.Instance.questDatabase.data[acceptIdx], QuestStatus.Accepted);
         acceptIdx++;
     }
 
     public void OnClickRewardBtn()
     {
-        if (rewardIdx >= testQuests.Length)
+        if (rewardIdx >= QuestManager.Instance.questDatabase.data.Length)
         {
             return;
         }
-        QuestManager.Instance.UpdateQuestStatus(testQuests[rewardIdx], QuestStatus.Rewarded);
+        QuestManager.Instance.UpdateQuestStatus(QuestManager.Instance.questDatabase.data[rewardIdx], QuestStatus.Rewarded);
         rewardIdx++;
     }
 }

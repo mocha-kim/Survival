@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: TestQuest4
   m_EditorClassIdentifier: 
   data:
-    id: 1
+    id: 3
     targetID: 0
     destNPCID: 0
-    currentCount: 9
+    currentCount: 10
     goalCount: 7
     rewardGold: 70
     rewardItemIds: 
     rewardItemCounts: 
   type: 1
   camp: 0
-  status: 3
+  status: 2
   title: "\uD14C\uC2A4\uD2B84"
-  summary: 
+  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
   description: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294
-    \uD018\uC2A4\uD2B8"
+    \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

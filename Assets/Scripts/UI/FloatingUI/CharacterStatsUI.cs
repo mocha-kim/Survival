@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CharacterStatsUI : Interface
+public class CharacterStatsUI : UserInterface
 {
     [SerializeField]
     private StatsObject playerStats;
@@ -54,10 +54,10 @@ public class CharacterStatsUI : Interface
         GameObject slot;
         for (int i = 0; i < playerStats.conditions.Count; i++)
         {
-            if (playerStats.conditions[(ConditionType)i].isActive)
+            if (playerStats.conditions[(ConditionType)i].isActive && !playerStats.conditions[(ConditionType)i].needTreatment)
             {
                 slot = conditionArea.transform.GetChild(i).gameObject;
-                slot.GetComponentInChildren<TextMeshProUGUI>().text = playerStats.conditions[(ConditionType)i].DisplayTime.ToString("n0");
+                slot.GetComponentInChildren<TextMeshProUGUI>().text = playerStats.conditions[(ConditionType)i].DisplayTime.ToString("f0");
             }
         }
     }
@@ -104,15 +104,15 @@ public class CharacterStatsUI : Interface
     private void UpdataConditionSlot(GameObject slot, Condition condition)
     {
         slot.GetComponentsInChildren<Image>()[1].color = condition.isActive ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 0);
-        slot.GetComponentInChildren<TextMeshProUGUI>().color = condition.isActive ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 0);
+        slot.GetComponentInChildren<TextMeshProUGUI>().color = (condition.isActive && !condition.needTreatment) ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 0);
     }
 
     private void UpdateStatusValues()
     {
         for (int i = 0; i < 4; i++)
         {
-            statusTexts[i].text = playerStats.statuses[(StatusType)i].currentValue.ToString();
-            statusTexts[i + 4].text = playerStats.statuses[(StatusType)i].maxValue.ToString();
+            statusTexts[i].text = playerStats.statuses[(StatusType)i].currentValue.ToString("n0");
+            statusTexts[i + 4].text = playerStats.statuses[(StatusType)i].maxValue.ToString("n0");
         }
     }
 
@@ -125,7 +125,7 @@ public class CharacterStatsUI : Interface
             mValue = playerStats.attributes[(AttributeType)i].modifiedValue;
             bValue = playerStats.attributes[(AttributeType)i].baseValue;
             attributeTexts[i].text = mValue.ToString();
-            attributeTexts[i + 3].text = "( " + bValue.ToString() + " + " + (mValue - bValue).ToString() + " )";
+            attributeTexts[i + 3].text = "( " + bValue.ToString("f0") + (mValue - bValue >= 0 ? " + " : " - ") + Mathf.Abs(mValue - bValue).ToString("f0") + " )";
         }
         sliders[0].value = playerStats.attributes[AttributeType.Handiness].modifiedValue;
         sliders[1].value = playerStats.attributes[AttributeType.Cooking].modifiedValue;

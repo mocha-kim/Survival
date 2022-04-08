@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class QuestListUI : Interface
+public class QuestListUI : UserInterface, IVerticalScrollable
 {
     [SerializeField]
     private GameObject slotParent;
@@ -22,6 +22,13 @@ public class QuestListUI : Interface
 
     [SerializeField]
     private GameObject description;
+    [SerializeField]
+    private Scrollbar scroll;
+
+    [SerializeField]
+    private GameObject topPanel;
+    [SerializeField]
+    private GameObject btmPanel;
 
     private GameObject previousSlot = null;
     private GameObject previousTab = null;
@@ -50,12 +57,43 @@ public class QuestListUI : Interface
         previousTab = defaultTab;
     }
 
-    private void ResizeContent()
+    public void ResizeViewport()
+    { }
+
+    public void ResizeContent()
     {
-        // calc lengthes to resize content area
-        float contentLength = Mathf.Abs(start) + slotCount * (slotHeight + space);
+        float contentLength = Mathf.Abs(start) + slotCount * (slotHeight + space) - space;
 
         slotParent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentLength);
+        SetGradientPanel();
+    }
+
+    public void SetGradientPanel()
+    {
+        if (scroll.size <= 0.99)
+        {
+            if (scroll.value >= 0.99)
+            {
+                topPanel.SetActive(false);
+            }
+            else
+            {
+                topPanel.SetActive(true);
+            }
+            if (scroll.value <= 0.01)
+            {
+                btmPanel.SetActive(false);
+            }
+            else
+            {
+                btmPanel.SetActive(true);
+            }
+        }
+        else
+        {
+            topPanel.SetActive(false);
+            btmPanel.SetActive(false);
+        }
     }
 
     private void CreateAllItems()
@@ -63,13 +101,13 @@ public class QuestListUI : Interface
         slotCount = 0;
         slotHeight = slotPrefab.GetComponent<RectTransform>().sizeDelta.y;
 
-        for (int i = 0; i < QuestManager.Instance.acceptedQuests.Count; i++)
+        for (int i = 0; i < QuestManager.Instance.playerQuests.acceptedQuests.Count; i++)
         {
-            CreateItem(QuestManager.Instance.acceptedQuests.questObjects[i]);
+            CreateItem(QuestManager.Instance.playerQuests.acceptedQuests[i]);
         }
-        for (int i = 0; i < QuestManager.Instance.rewardedQuests.Count; i++)
+        for (int i = 0; i < QuestManager.Instance.playerQuests.rewardedQuests.Count; i++)
         {
-            CreateItem(QuestManager.Instance.rewardedQuests.questObjects[i]);
+            CreateItem(QuestManager.Instance.playerQuests.rewardedQuests[i]);
         }
 
         ResizeContent();
@@ -116,7 +154,7 @@ public class QuestListUI : Interface
     {
         int count = 0;
 
-        foreach (QuestObject quest in QuestManager.Instance.acceptedQuests.questObjects)
+        foreach (QuestObject quest in QuestManager.Instance.playerQuests.acceptedQuests)
         {
             GameObject go = slots[quest];
             if (go.activeSelf)
@@ -127,7 +165,7 @@ public class QuestListUI : Interface
                 count++;
             }
         }
-        foreach (QuestObject quest in QuestManager.Instance.rewardedQuests.questObjects)
+        foreach (QuestObject quest in QuestManager.Instance.playerQuests.rewardedQuests)
         {
             GameObject go = slots[quest];
             if (go.activeSelf)

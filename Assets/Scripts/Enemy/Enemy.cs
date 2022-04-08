@@ -7,6 +7,11 @@ public class Enemy
     public int id;
     public string name;
 
-    public int maxHP;
-    public int damage;
+    public float maxHP;
+    public float currentHP;
+    public float damage;
+
+    public float conExp;
+    public float strExp;
+    public float defExp;
 }

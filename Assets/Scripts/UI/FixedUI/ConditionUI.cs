@@ -51,10 +51,10 @@ public class ConditionUI : MonoBehaviour
                 GameObject go = slotGOs[activatedNum];
                 slots[go] = condition;
 
-                go.GetComponentInChildren<Image>().sprite = condition.icon;
+                go.GetComponentsInChildren<Image>()[1].sprite = condition.icon;
                 go.GetComponentInChildren<TextMeshProUGUI>().text = condition.TypeToKorean();
                 int length = condition.TypeToKorean().Length;
-                go.GetComponentsInChildren<RectTransform>()[2].sizeDelta = new Vector2(60 * (float)length / 4, 16f);
+                go.GetComponentsInChildren<RectTransform>()[3].sizeDelta = new Vector2(60 * (float)length / 4, 16f);
 
                 go.SetActive(true);
 
@@ -74,8 +74,6 @@ public class ConditionUI : MonoBehaviour
                 break;
             }
         }
-
-        Debug.Log("Changed condition: " + condition.type + "(" + changedIdx + ")");
 
         if (condition.isActive)
         {

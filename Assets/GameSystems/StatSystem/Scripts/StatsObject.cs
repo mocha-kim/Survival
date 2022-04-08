@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Stats", menuName = "Stat System/Stats")]
@@ -18,22 +17,6 @@ public class StatsObject : ScriptableObject
 
     public bool isInitialized = false;
     public bool IsDead => statuses[StatusType.HP].currentValue <= 0;
-
-    public int CountActivatedConditions
-    {
-        get
-        {
-            int count = 0;
-            foreach (Condition condition in conditions.Values)
-            {
-                if (condition.isActive)
-                {
-                    count++;
-                }
-            }
-            return count;
-        }
-    }
 
     private void OnEnable()
     {
@@ -54,8 +37,6 @@ public class StatsObject : ScriptableObject
         {
             Status status = new(type, 100);
             statuses[type] = status;
-
-            Debug.Log("created " + type.ToString());
         }
 
         // init attributes
@@ -63,13 +44,11 @@ public class StatsObject : ScriptableObject
         {
             Attribute attribute = new(type, 10);
             attributes[type] = attribute;
-            Debug.Log("created " + type.ToString());
         }
         for (AttributeType type = AttributeType.Handiness; type <= AttributeType.Cooking; type++)
         {
             Attribute attribute = new(type, 1);
             attributes[type] = attribute;
-            Debug.Log("created " + type.ToString());
         }
 
         // init conditions
@@ -77,27 +56,73 @@ public class StatsObject : ScriptableObject
         {
             Condition condition = new(type);
             conditions[type] = condition;
-            Debug.Log("created " + type.ToString());
         }
     }
 
-    public void AddStatusValue(StatusType type, int value)
+    public int CountActivatedConditions()
     {
-        int updatedValue = statuses[type].currentValue + value;
+        int count = 0;
+        foreach (Condition condition in conditions.Values)
+        {
+            if (condition.isActive)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void AddStatusCurrentValue(StatusType type, float value)
+    {
+        float updatedValue = statuses[type].currentValue + value;
         updatedValue = Math.Clamp(updatedValue, 0, statuses[type].maxValue);
         statuses[type].currentValue = updatedValue;
 
         OnStatChanged?.Invoke(this);
     }
 
-    public void AddAttributeValue(AttributeType type, int value)
+    // returns updated max value
+    public float AddStatusMaxValue(StatusType type, float value)
     {
-        if (value < 0)
-        {
-            return;
-        }
+        if (value <= 0) return statuses[type].maxValue;
 
-        attributes[type].modifiedValue += value;
+        float updatedValue = statuses[type].maxValue + value;
+        float limitValue = GetStatusMaxValue(type);
+
+        updatedValue = Math.Clamp(updatedValue, 0, limitValue);
+        statuses[type].maxValue = updatedValue;
+
+        OnStatChanged?.Invoke(this);
+        return updatedValue;
+    }
+
+    // Use when equipments chaged only
+    public void AddAttributeBaseValue(AttributeType type, int value)
+    {
+        if (value <= 0) return;
+
+        int oldValue = attributes[type].baseValue;
+        int updatedValue = oldValue + value;
+        int limitValue = GetAttributeMaxValue(type);
+
+        updatedValue = Mathf.Clamp(updatedValue, 0, limitValue);
+        attributes[type].baseValue = updatedValue;
+        AddAttributeModifiedValue(type, updatedValue - oldValue);
+
+        if (type == AttributeType.CON)
+        {
+            CalulateConstitutionEffects();
+        }
+        OnStatChanged?.Invoke(this);
+    }
+
+    // Cooking, Handiness attributes must not use this
+    public void AddAttributeModifiedValue(AttributeType type, int value)
+    {
+        int updatedValue = attributes[type].modifiedValue + value;
+
+        updatedValue = Mathf.Clamp(updatedValue, 0, 100 - GetAttributeMaxValue(type));
+        attributes[type].modifiedValue = updatedValue;
 
         if (type == AttributeType.CON)
         {
@@ -108,14 +133,12 @@ public class StatsObject : ScriptableObject
 
     public void AddAttributeExp(AttributeType type, float value)
     {
-        if (value < 0)
-        {
-            return;
-        }
+        if (value <= 0) return;
 
         attributes[type].exp += value;
         if (attributes[type].exp >= 100)
         {
+            if (attributes[type].baseValue + 1 > GetAttributeMaxValue(type)) return;
             attributes[type].baseValue++;
             attributes[type].modifiedValue++;
             attributes[type].exp -= 100;
@@ -135,11 +158,20 @@ public class StatsObject : ScriptableObject
         OnConditionChanged?.Invoke(this, condition);
     }
 
+    public void ActivateCondition(Condition condition)
+    {
+        Debug.Log("Activate " + condition.type + ", it will last until treated");
+        condition.isActive = true;
+        condition.needTreatment = true;
+        OnConditionChanged?.Invoke(this, condition);
+    }
+
     public void DeactivateCondition(Condition condition)
     {
         Debug.Log("Deactivate " + condition.type);
         condition.isActive = false;
         condition.activationTime = 0;
+        condition.needTreatment = false;
         OnConditionChanged?.Invoke(this, condition);
     }
 
@@ -194,16 +226,46 @@ public class StatsObject : ScriptableObject
     // calculate HP and SP value when CON changed
     private void CalulateConstitutionEffects()
     {
-        int oldValue = statuses[StatusType.HP].maxValue;
-        int newValue = statuses[StatusType.HP].maxValue + (5 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
+        float oldValue = statuses[StatusType.HP].maxValue;
+        float newValue = AddStatusMaxValue(StatusType.HP, 5 * (attributes[AttributeType.CON].modifiedValue - 10));
 
         statuses[StatusType.HP].maxValue = newValue;
         statuses[StatusType.HP].currentValue += newValue - oldValue;
 
         oldValue = statuses[StatusType.SP].maxValue;
-        newValue = statuses[StatusType.SP].maxValue + (2 * (attributes[(int)AttributeType.CON].modifiedValue - 10));
+        newValue = AddStatusMaxValue(StatusType.SP, 2 * (attributes[AttributeType.CON].modifiedValue - 10));
 
         statuses[StatusType.SP].maxValue = newValue;
         statuses[StatusType.SP].currentValue += newValue - oldValue;
+    }
+
+    private float GetStatusMaxValue(StatusType type)
+    {
+        switch (type)
+        {
+            case StatusType.HP:
+                return 500;
+            case StatusType.SP:
+                return 200;
+            case StatusType.Hunger:
+            case StatusType.Thirst:
+                return 100;
+        }
+        return 0;
+    }
+
+    private int GetAttributeMaxValue(AttributeType type)
+    {
+        switch (type)
+        {
+            case AttributeType.CON:
+            case AttributeType.STR:
+            case AttributeType.DEF:
+                return 60;
+            case AttributeType.Handiness:
+            case AttributeType.Cooking:
+                return 10;
+        }
+        return 0;
     }
 }

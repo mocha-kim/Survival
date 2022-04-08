@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingsUI : Interface
+public class SettingsUI : UserInterface
 {
     [SerializeField]
     private Slider masterSlider;

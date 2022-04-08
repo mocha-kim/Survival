@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c7c0fec3ef465412f86fe7661a2ca09d, type: 3}
-  m_Name: TestQuest3
+  m_Name: TestQuest8
   m_EditorClassIdentifier: 
   data:
-    id: 2
-    targetID: 0
+    id: 7
+    targetID: 1
     destNPCID: 0
-    currentCount: 10
-    goalCount: 10
-    rewardGold: 100
-    rewardItemIds: 
-    rewardItemCounts: 
+    currentCount: 19
+    goalCount: 20
+    rewardGold: 0
+    rewardItemIds: 00000000
+    rewardItemCounts: 04000000
   type: 1
-  camp: 2
-  status: 2
-  title: "\uD14C\uC2A4\uD2B83"
-  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 10\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
-  description: "0\uBC88 \uC544\uC774\uD15C\uC744 10\uAC1C \uAC00\uC838\uC624\uB294
+  camp: 1
+  status: 1
+  title: "\uD14C\uC2A4\uD2B88"
+  summary: "1\uBC88 \uC544\uC774\uD15C\uC744 20\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
+  description: "1\uBC88 \uC544\uC774\uD15C\uC744 20\uAC1C \uAC00\uC838\uC624\uB294
     \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

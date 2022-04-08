@@ -8,6 +8,9 @@ using UnityEngine;
 
 public class PlayerAttackCollision : MonoBehaviour
 {
+    [SerializeField]
+    private StatsObject playerStat;
+
     private void OnEnable()
     {
         StartCoroutine("AutoDisable");
@@ -17,7 +20,7 @@ public class PlayerAttackCollision : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<EnemyController>().OnHit(10);
+            other.GetComponent<EnemyController>().OnHit(playerStat.attributes[AttributeType.STR].modifiedValue);
         }
     }
 

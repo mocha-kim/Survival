@@ -41,9 +41,11 @@ public class PlayerAnimator : MonoBehaviour
         if (speed == 5.0f)
         {
             animator.SetBool("isRun", true);
+            animator.SetBool("isCrouch", false);
         }
         else if (speed == 1.0f)
         {
+            animator.SetBool("isRun", false);
             animator.SetBool("isCrouch", true);
         }
         else
@@ -56,5 +58,10 @@ public class PlayerAnimator : MonoBehaviour
     public void OnHit()
     {
         animator.SetTrigger("onHit");
+    }
+
+    public void Dead()
+    {
+        animator.SetTrigger("onDying");
     }
 }

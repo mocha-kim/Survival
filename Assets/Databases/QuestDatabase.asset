@@ -12,9 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28a483f47110f48bfa47cfd245ecb331, type: 3}
   m_Name: QuestDatabase
   m_EditorClassIdentifier: 
-  questObjects:
+  data:
   - {fileID: 11400000, guid: cc11d236c31cb48b98dc84a53c248eca, type: 2}
   - {fileID: 11400000, guid: 9ab33cb8af219497fb2fa5461eb3e891, type: 2}
   - {fileID: 11400000, guid: 74a4dae406be1455dbee6dea84dfd6c6, type: 2}
   - {fileID: 11400000, guid: 83c7c3d28156b4a09ac8126256083e02, type: 2}
   - {fileID: 11400000, guid: 2071ad79a606c48d3817d214ad9f92ff, type: 2}
+  - {fileID: 11400000, guid: 6a1edacace9a7477da389f369cbd7fff, type: 2}
+  - {fileID: 11400000, guid: 7dc736cbca7844c77a7dd342b8b04f17, type: 2}
+  - {fileID: 11400000, guid: 0ddbc25d7bb394371aba8b530fc1e344, type: 2}
+  - {fileID: 11400000, guid: 86499bd2ad77c4ee8a9fc5369fe2ae06, type: 2}
+  - {fileID: 11400000, guid: dd68d43a2d85343529e540afa8b97771, type: 2}

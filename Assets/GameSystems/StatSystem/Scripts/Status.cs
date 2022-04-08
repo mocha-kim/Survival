@@ -16,8 +16,8 @@ using UnityEngine;
 public class Status
 {
     public StatusType type;
-    public int currentValue;
-    public int maxValue;
+    public float currentValue;
+    public float maxValue;
 
     public float Percentage
     {
@@ -27,7 +27,7 @@ public class Status
         }
     }
 
-    public Status(StatusType type, int maxValue)
+    public Status(StatusType type, float maxValue)
     {
         this.type = type;
         this.maxValue = maxValue;

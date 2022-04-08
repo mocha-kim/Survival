@@ -8,6 +8,11 @@ using UnityEngine;
 
 public class EnemyAttackCollision : MonoBehaviour
 {
+    // Enemy Database
+    [SerializeField]
+    private EnemyDatabase database;
+    [SerializeField]
+    private int enemyID;
 
     private void OnEnable()
     {
@@ -18,7 +23,7 @@ public class EnemyAttackCollision : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerController>().OnHit(10);
+            other.GetComponent<PlayerController>().OnHit(database.datas[enemyID].damage);
         }
     }
 

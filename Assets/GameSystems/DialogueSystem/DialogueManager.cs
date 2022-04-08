@@ -20,8 +20,8 @@ public class DialogueManager : MonoBehaviour
     // Component
     public GameObject toChat;     // [F] To Chat
     public GameObject dialogueUI; // Dialogue
-    public GameObject YesButton;  // Yes Button
-    public GameObject NoButton;   // No Button
+    public Button YesButton;      // Yes Button
+    public Button NoButton;       // No Button
     public Text nameText;         // NPC Name
     public Text dialogueText;     // NPC Dialogue
 
@@ -118,6 +118,7 @@ public class DialogueManager : MonoBehaviour
 
             while (true)
             {
+                //if(YesButton.onClick.AddListener())
                 if (Input.GetKeyDown(dialogueKeyCode) && !dialogueEnded)
                 {
                     break;
@@ -188,8 +189,8 @@ public class DialogueManager : MonoBehaviour
     {
         toChat.SetActive(false);
         dialogueUI.SetActive(false);
-        YesButton.SetActive(false);
-        NoButton.SetActive(false);
+        //YesButton.SetActive(false);
+        //NoButton.SetActive(false);
         OnEndDialogue?.Invoke();
 
         if (!GameManager.Instance.IsGamePlaying)
@@ -208,8 +209,8 @@ public class DialogueManager : MonoBehaviour
             StopAllCoroutines();
             toChat.SetActive(false);
             dialogueUI.SetActive(false);
-            YesButton.SetActive(false);
-            NoButton.SetActive(false);
+            //YesButton.SetActive(false);
+            //NoButton.SetActive(false);
         }
 
         if (!GameManager.Instance.IsGamePlaying)
@@ -220,7 +221,7 @@ public class DialogueManager : MonoBehaviour
 
     public void QuestSelection()
     {
-        YesButton.SetActive(true);
-        NoButton.SetActive(true);
+        //YesButton.SetActive(true);
+        //NoButton.SetActive(true);
     }
 }

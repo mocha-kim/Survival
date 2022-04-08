@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: TestQuest5
   m_EditorClassIdentifier: 
   data:
-    id: 2
+    id: 4
     targetID: 1
     destNPCID: 0
-    currentCount: 0
+    currentCount: 22
     goalCount: 5
     rewardGold: 0
     rewardItemIds: 
     rewardItemCounts: 
-  type: 0
+  type: 1
   camp: 2
-  status: 1
+  status: 2
   title: "\uD14C\uC2A4\uD2B85"
-  summary: 
-  description: "1\uBC88 \uC801\uC744 5\uB9C8\uB9AC \uC7A1\uB294 \uD018\uC2A4\uD2B8"
+  summary: "1\uBC88 \uC801\uC744 5\uB9C8\uB9AC \uC7A1\uB294 \uD018\uC2A4\uD2B8"
+  description: "1\uBC88 \uC801\uC744 5\uB9C8\uB9AC \uC7A1\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

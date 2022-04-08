@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
-public abstract class InventoryUI : Interface
+public abstract class InventoryUI : UserInterface
 {
     public InventoryObject inventoryObject;
     public Dictionary<GameObject, InventorySlot> slots = new();

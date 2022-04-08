@@ -25,14 +25,21 @@ public class EnemyController : MonoBehaviour
 
     // Component
     [SerializeField]
-    private Transform target;
+    private GameObject target;
     private Vector3 targetLastPosition;
     [SerializeField]
     private GameObject attackCollision;
     private NavMeshAgent navMeshAgent;
     private Animator animator;
     private FieldOfView fieldOfView;
-    
+    private StatsObject playerStat;
+
+    // Enemy Database
+    [SerializeField]
+    private EnemyDatabase database;
+    [SerializeField]
+    private int enemyID;
+
     // Movement Control
     private float distance;
     [SerializeField]
@@ -44,7 +51,7 @@ public class EnemyController : MonoBehaviour
     private bool isDead = false;
     //private bool isTrack = false;
     private bool isDelay = false;
-    private float attackDelay = 2.633f;
+    private float attackDelay = 1.755f;
     private float onHitDelay = 2f;
 
     private void Awake()
@@ -52,17 +59,23 @@ public class EnemyController : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fieldOfView = GetComponent<FieldOfView>();
+    }
+
+    private void Start()
+    {
+        playerStat = GameManager.Instance.playerStats;
+        database.datas[enemyID].currentHP = database.datas[enemyID].maxHP;
 
         StartCoroutine(CheckState());
     }
 
     private IEnumerator CheckState()
     {
-        while (!isDead)
+        while (!isDead && !playerStat.IsDead)
         {
-            distance = Vector3.Distance(transform.position, target.position);
+            distance = Vector3.Distance(transform.position, target.transform.position);
 
-            if (distance <= attackDistance && !isDelay) // 1.0f
+            if (distance <= attackDistance && !isDelay) // Attack
             {
                 isDelay = true;
                 state = State.Attack;
@@ -80,14 +93,23 @@ public class EnemyController : MonoBehaviour
                 // else if(isTrack == true)                state = State.trace2;
             }
 
-            if (distance > traceDistance)
+            if (distance > traceDistance || playerStat.IsDead)
             {
                 state = State.Idle;
                 CheckStateForAction();
             }
 
-            yield return new WaitForSeconds(1f);
+            if (database.datas[enemyID].maxHP <= 0)
+            {
+                state = State.Dead;
+                isDead = true;
+                CheckStateForAction();
+            }
+
+            yield return new WaitForSeconds(0.1f);
         }
+
+        yield return new WaitForSeconds(0);
     }
 
     private void CheckStateForAction()
@@ -122,7 +144,18 @@ public class EnemyController : MonoBehaviour
 
             case State.Attack:
                 navMeshAgent.isStopped = true;
+                animator.SetBool("isTrace", false);
                 animator.SetTrigger("onAttack");
+                break;
+
+            case State.Dead:
+                navMeshAgent.isStopped = true;
+                animator.SetBool("isTrace", false);
+                animator.SetTrigger("onDying");
+                playerStat.AddAttributeExp(AttributeType.CON, database.datas[enemyID].conExp);
+                playerStat.AddAttributeExp(AttributeType.STR, database.datas[enemyID].strExp);
+                playerStat.AddAttributeExp(AttributeType.DEF, database.datas[enemyID].defExp);
+                gameObject.GetComponent<CapsuleCollider>().enabled = false;
                 break;
         }
     }
@@ -135,16 +168,28 @@ public class EnemyController : MonoBehaviour
 
     public void OnHit(int damage)
     {
-        Debug.Log("Zombie takes " + damage + " Damage!!");
+        if (!isDead)
+        {
+            navMeshAgent.isStopped = true;
+            animator.SetBool("isTrace", false);
+            database.datas[enemyID].currentHP -= damage;
 
-        // Animation
-        animator.SetTrigger("onHit");
-        navMeshAgent.isStopped = true;
-        StartCoroutine(Delay(onHitDelay));
+            animator.SetTrigger("onHit");
+            navMeshAgent.isStopped = true;
+            StartCoroutine(Delay(onHitDelay));
+        }
     }
 
     public void OnAttackCollision()
     {
         attackCollision.SetActive(true);
+    }
+
+    public void OnStatChanged(StatsObject stats)
+    {
+        // player stats 
+        // 죽었을 때
+        // 체력이 변하면 OnStatChanged
+        // Update 대신 이걸 써라!!!
     }
 }

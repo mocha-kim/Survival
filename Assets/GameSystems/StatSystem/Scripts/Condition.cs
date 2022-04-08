@@ -12,6 +12,7 @@ public class Condition
     public Sprite icon;
 
     public bool isActive;
+    public bool needTreatment;
     public float activationTime;
 
     public int DisplayTime
@@ -30,6 +31,7 @@ public class Condition
     {
         this.type = type;
         isActive = false;
+        needTreatment = false;
         activationTime = 0f;
     }
 

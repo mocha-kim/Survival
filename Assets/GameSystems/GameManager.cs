@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -11,8 +12,6 @@ public class GameManager : MonoBehaviour
     public StatsObject playerStats;
     public InventoryObject inventory;
     public InventoryObject quickslot;
-
-    public bool isNewPlayer = true;
 
     public int selectedQuickslot = 0;
 
@@ -47,6 +46,7 @@ public class GameManager : MonoBehaviour
         {
             if (condition.isActive)
             {
+                if (condition.needTreatment) continue;
                 condition.activationTime -= Time.deltaTime;
                 if (condition.activationTime <= 0)
                 {
@@ -107,5 +107,25 @@ public class GameManager : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    public void SaveGame()
+    {
+        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Player/playerStats");
+        SaveLoad.SaveData(QuestManager.Instance.playerQuests, Application.persistentDataPath + "/Player/playerQuests");
+        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Inventory/inventory");
+        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Inventory/quickslot");
+
+        Debug.Log("! Game Saved !");
+    }
+
+    public void LoadGame()
+    {
+        playerStats = SaveLoad.LoadData<StatsObject>(Application.persistentDataPath + "/Player/playerStats");
+        QuestManager.Instance.playerQuests = SaveLoad.LoadData<QuestDataContainer>(Application.persistentDataPath + "/Player/playerQuests");
+        inventory = SaveLoad.LoadData<InventoryObject>(Application.persistentDataPath + "/Inventory/inventory");
+        quickslot = SaveLoad.LoadData<InventoryObject>(Application.persistentDataPath + "/Inventory/quickslot");
+
+        Debug.Log("! Game Loaded !");
     }
 }

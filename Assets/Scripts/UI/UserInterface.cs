@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(EventTrigger))]
-public class Interface : MonoBehaviour
+public class UserInterface : MonoBehaviour
 {
     public GameObject dragArea;
 

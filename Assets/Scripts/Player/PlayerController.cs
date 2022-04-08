@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private PlayerAnimator playerAnimator;
 
     // Key Setting
+    private DoubleKeyPress[] keys;
     [SerializeField]
     private KeyCode jumpKeyCode = KeyCode.Space;
     [SerializeField]
@@ -37,11 +38,19 @@ public class PlayerController : MonoBehaviour
     private bool isDelay;
     private bool isMove;
     private float attackDelay = 1.1335f;
+    bool crouch = false, walk = false, run = false;
 
     // Game system objects
     private StatsObject playerStat;
     private InventoryObject inventory;
     private InventoryObject quickslot;
+
+    // Attributes
+    private float con;
+    private float str;
+    private float def;
+    private float handiness;
+    private float cooking;
 
     private void Awake()
     {
@@ -60,6 +69,14 @@ public class PlayerController : MonoBehaviour
 
         playerStat.OnStatChanged += OnStatChanged;
         QuestManager.Instance.OnRewardedQuest += OnRewardedQuest;
+
+        keys = new[]
+        {
+        new DoubleKeyPress(KeyCode.W),
+        new DoubleKeyPress(KeyCode.A),
+        new DoubleKeyPress(KeyCode.S),
+        new DoubleKeyPress(KeyCode.D),
+        };
     }
 
     private void Update()
@@ -77,7 +94,7 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(characterController.velocity.y) < jumpForce / 3f)
             {
                 RaycastHit hit;
-                if (Physics.Raycast(transform.position, Vector3.down, out hit, 1f, mask))
+                if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.1f, mask))
                 {
                     isGround = true;
                 }
@@ -88,29 +105,45 @@ public class PlayerController : MonoBehaviour
             {
                 moveDirection.y = jumpForce;
                 playerAnimator.OnJump();
+                playerStat.AddStatusCurrentValue(StatusType.SP, -1);
             }
 
-            // Move
+            // Move : moveSpeed(0, 1.0f, 2.0f, 5.0f = idle, crouch, walk, run)
             moveDirection.x = Input.GetAxisRaw("Horizontal");
             moveDirection.z = Input.GetAxisRaw("Vertical");
 
-            if (Input.GetMouseButton(0))
+            for (int i = 0; i < keys.Length; i++)
             {
-                moveSpeed = 5.0f; // Run
+                keys[i].Update();
             }
-            else if (Input.GetKey(crouchKeyCode))
+            keys[0].UpdateAction(() => walk = true, () => run = true);
+            keys[1].UpdateAction(() => walk = true, () => run = true);
+            keys[2].UpdateAction(() => walk = true, () => run = true);
+            keys[3].UpdateAction(() => walk = true, () => run = true);
+
+            if (Input.GetKey(crouchKeyCode))
             {
-                moveSpeed = 1.0f; // Crouch
+                moveSpeed = 1.0f;
+                playerStat.AddStatusCurrentValue(StatusType.SP, -0.003f);
+            }
+            else if (run == true)
+            {
+                moveSpeed = 5.0f;
+                playerStat.AddStatusCurrentValue(StatusType.SP, -0.005f);
+            }
+            else if (walk == true)
+            {
+                moveSpeed = 2.0f;
+                playerStat.AddStatusCurrentValue(StatusType.SP, -0.001f);
             }
             else
             {
-                moveSpeed = 2.0f; // Walk
+                moveSpeed = 0;
             }
 
-            // isMove : Check player movement
+            Vector3 movement;
             isMove = !(moveDirection.x == 0 && moveDirection.z == 0);
-
-            if (isMove)
+            if (isMove) // Player Move (x, y, z)
             {
                 // cameraTransform.(x, y, z) = cameraTransform.(right, up, forward)
                 Vector3 lookForward = new Vector3(cameraTransform.forward.x, 0f, cameraTransform.forward.z).normalized;
@@ -118,16 +151,18 @@ public class PlayerController : MonoBehaviour
                 Vector3 lookDir = (lookForward * moveDirection.z + lookRight * moveDirection.x) * moveSpeed;
 
                 // Player Rotation
-                transform.forward = lookDir;
+                Quaternion rotate = Quaternion.LookRotation(lookDir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotate, Time.deltaTime * 10);
 
-                // Player Move (x, y, z)
-                characterController.Move(new Vector3(lookDir.x, moveDirection.y, lookDir.z) * Time.deltaTime);
+                movement = new Vector3(lookDir.x, moveDirection.y, lookDir.z);
             }
-            else
+            else // Player Move (0, y, 0)
             {
-                // Player Move (0, y, 0)
-                characterController.Move(moveDirection * Time.deltaTime);
+                movement = new Vector3(0, moveDirection.y, 0);
+                walk = false;
+                run = false;
             }
+            characterController.Move(movement * Time.deltaTime);
 
             // Animation
             playerAnimator.OnMove(isMove, moveSpeed);
@@ -137,17 +172,24 @@ public class PlayerController : MonoBehaviour
             {
                 isDelay = true;
                 playerAnimator.OnWeaponAttack();
+                playerStat.AddStatusCurrentValue(StatusType.SP, -1);
                 StartCoroutine(Delay(attackDelay));
             }
         }
     }
 
-    public void OnHit(int damage)
+    public void OnHit(float damage)
     {
-        Debug.Log("Player takes " + damage + " Damage!!");
+        playerStat.AddStatusCurrentValue(StatusType.HP, -damage * def);
 
-        // Animation
-        playerAnimator.OnHit();
+        if (playerStat.IsDead)
+        {
+            playerAnimator.Dead();
+        }
+        else
+        {
+            playerAnimator.OnHit();
+        }
     }
 
     private IEnumerator Delay(float time)
@@ -158,7 +200,16 @@ public class PlayerController : MonoBehaviour
 
     public void OnStatChanged(StatsObject stats)
     {
-        // player stats 
+        /*
+        private float con;
+        private float str;
+        private float def;
+        private float handiness;
+        private float cooking;
+        */
+
+        // AttackCollision manage (str = stats.attributes[AttributeType.STR].modifiedValue;)
+        def = 100f / (100 + stats.attributes[AttributeType.DEF].modifiedValue);
     }
 
     private void OnUseItem(ItemObject item)
@@ -172,7 +223,7 @@ public class PlayerController : MonoBehaviour
                     {
                         if (status.type == effect.statusType)
                         {
-                            playerStat.AddStatusValue(effect.statusType, (int)effect.value);
+                            playerStat.AddStatusCurrentValue(effect.statusType, (int)effect.value);
                             break;
                         }
                     }
