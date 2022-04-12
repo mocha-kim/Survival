@@ -125,7 +125,7 @@ public class QuestManager : MonoBehaviour
         // add gold or items to player
         InventoryObject inventory = GameManager.Instance.inventory;
         int requiredSlotCount = 0;
-        for (int i = 0; i < quest.data.rewardItemIds.Length; i++)
+        for (int i = 0; i < quest.data.rewardItemIds.Count; i++)
         {
             if (GameManager.Instance.IsItemStackable(quest.data.rewardItemIds[i]))
             {
@@ -145,7 +145,7 @@ public class QuestManager : MonoBehaviour
             return false;
         }
 
-        for (int i = 0; i < quest.data.rewardItemIds.Length; i++)
+        for (int i = 0; i < quest.data.rewardItemIds.Count; i++)
         {
             inventory.AddItem(quest.data.rewardItemIds[i], quest.data.rewardItemCounts[i]);
         }

@@ -12,8 +12,8 @@ public class Quest
     public int goalCount;
 
     public int rewardGold;
-    public int[] rewardItemIds;
-    public int[] rewardItemCounts;
+    public List<int> rewardItemIds = new();
+    public List<int> rewardItemCounts = new();
 
     public Quest()
     {

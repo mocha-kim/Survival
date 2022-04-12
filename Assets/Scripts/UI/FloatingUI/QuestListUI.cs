@@ -25,11 +25,6 @@ public class QuestListUI : UserInterface, IVerticalScrollable
     [SerializeField]
     private Scrollbar scroll;
 
-    [SerializeField]
-    private GameObject topPanel;
-    [SerializeField]
-    private GameObject btmPanel;
-
     private GameObject previousSlot = null;
     private GameObject previousTab = null;
     [SerializeField]
@@ -65,35 +60,6 @@ public class QuestListUI : UserInterface, IVerticalScrollable
         float contentLength = Mathf.Abs(start) + slotCount * (slotHeight + space) - space;
 
         slotParent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentLength);
-        SetGradientPanel();
-    }
-
-    public void SetGradientPanel()
-    {
-        if (scroll.size <= 0.99)
-        {
-            if (scroll.value >= 0.99)
-            {
-                topPanel.SetActive(false);
-            }
-            else
-            {
-                topPanel.SetActive(true);
-            }
-            if (scroll.value <= 0.01)
-            {
-                btmPanel.SetActive(false);
-            }
-            else
-            {
-                btmPanel.SetActive(true);
-            }
-        }
-        else
-        {
-            topPanel.SetActive(false);
-            btmPanel.SetActive(false);
-        }
     }
 
     private void CreateAllItems()
@@ -193,7 +159,7 @@ public class QuestListUI : UserInterface, IVerticalScrollable
         RefreshAllItemsTransform();
     }
 
-    private void ShowFilteredItems(QuestCampType camp)
+    private void ShowFilteredItems(CampType camp)
     {
         slotCount = 0;
         slotHeight = slotPrefab.GetComponent<RectTransform>().sizeDelta.y;
@@ -267,7 +233,7 @@ public class QuestListUI : UserInterface, IVerticalScrollable
         button.GetComponent<Image>().sprite = tabBackgrounds[1];
         previousTab = button;
 
-        ShowFilteredItems(QuestCampType.Lawful);
+        ShowFilteredItems(CampType.Lawful);
     }
 
     public void OnClickNeutralCamp(GameObject button)
@@ -281,7 +247,7 @@ public class QuestListUI : UserInterface, IVerticalScrollable
         button.GetComponent<Image>().sprite = tabBackgrounds[1];
         previousTab = button;
 
-        ShowFilteredItems(QuestCampType.Neutral);
+        ShowFilteredItems(CampType.Neutral);
     }
 
     public void OnClickChaoticCamp(GameObject button)
@@ -295,6 +261,6 @@ public class QuestListUI : UserInterface, IVerticalScrollable
         button.GetComponent<Image>().sprite = tabBackgrounds[1];
         previousTab = button;
 
-        ShowFilteredItems(QuestCampType.Chaotic);
+        ShowFilteredItems(CampType.Chaotic);
     }
 }

@@ -38,7 +38,14 @@ public class PlayerController : MonoBehaviour
     private bool isDelay;
     private bool isMove;
     private float attackDelay = 1.1335f;
-    bool crouch = false, walk = false, run = false;
+    private bool walk = false;
+    private bool run = false;
+    [SerializeField]
+    private float crouchTime;
+    [SerializeField]
+    private float walkTime;
+    [SerializeField]
+    private float runTime;
 
     // Game system objects
     private StatsObject playerStat;
@@ -106,6 +113,7 @@ public class PlayerController : MonoBehaviour
                 moveDirection.y = jumpForce;
                 playerAnimator.OnJump();
                 playerStat.AddStatusCurrentValue(StatusType.SP, -1);
+                playerStat.AddAttributeExp(AttributeType.CON, 1);
             }
 
             // Move : moveSpeed(0, 1.0f, 2.0f, 5.0f = idle, crouch, walk, run)
@@ -124,20 +132,41 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKey(crouchKeyCode))
             {
                 moveSpeed = 1.0f;
+                crouchTime += Time.deltaTime;
                 playerStat.AddStatusCurrentValue(StatusType.SP, -0.003f);
+                if(crouchTime > 10f)
+                {
+                    playerStat.AddAttributeExp(AttributeType.CON, 3);
+                    crouchTime = 0;
+                }
             }
             else if (run == true)
             {
                 moveSpeed = 5.0f;
+                runTime += Time.deltaTime;
                 playerStat.AddStatusCurrentValue(StatusType.SP, -0.005f);
+                if (runTime > 10f)
+                {
+                    playerStat.AddAttributeExp(AttributeType.CON, 5);
+                    runTime = 0;
+                }
             }
             else if (walk == true)
             {
                 moveSpeed = 2.0f;
+                walkTime += Time.deltaTime;
                 playerStat.AddStatusCurrentValue(StatusType.SP, -0.001f);
+                if (walkTime > 10f)
+                {
+                    playerStat.AddAttributeExp(AttributeType.CON, 1);
+                    walkTime = 0;
+                }
             }
             else
             {
+                crouchTime = 0;
+                walkTime = 0;
+                runTime = 0;
                 moveSpeed = 0;
             }
 
@@ -181,6 +210,7 @@ public class PlayerController : MonoBehaviour
     public void OnHit(float damage)
     {
         playerStat.AddStatusCurrentValue(StatusType.HP, -damage * def);
+        playerStat.AddAttributeExp(AttributeType.DEF, 5);
 
         if (playerStat.IsDead)
         {
@@ -256,13 +286,13 @@ public class PlayerController : MonoBehaviour
     {
         switch (quest.camp)
         {
-            case QuestCampType.Lawful:
+            case CampType.Lawful:
                 playerStat.lawfulCoin += quest.data.rewardGold;
                 break;
-            case QuestCampType.Neutral:
+            case CampType.Neutral:
                 playerStat.neutralCoin += quest.data.rewardGold;
                 break;
-            case QuestCampType.Chaotic:
+            case CampType.Chaotic:
                 playerStat.chaoticCoin += quest.data.rewardGold;
                 break;
         }

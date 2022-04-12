@@ -184,7 +184,7 @@ public class DebugUI : MonoBehaviour
 
     public void OnClickAcceptBtn()
     {
-        if (acceptIdx >= QuestManager.Instance.questDatabase.data.Length)
+        if (acceptIdx >= QuestManager.Instance.questDatabase.data.Count)
         {
             return;
         }
@@ -194,7 +194,7 @@ public class DebugUI : MonoBehaviour
 
     public void OnClickRewardBtn()
     {
-        if (rewardIdx >= QuestManager.Instance.questDatabase.data.Length)
+        if (rewardIdx >= QuestManager.Instance.questDatabase.data.Count)
         {
             return;
         }

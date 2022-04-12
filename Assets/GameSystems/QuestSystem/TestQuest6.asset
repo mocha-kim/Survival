@@ -23,7 +23,7 @@ MonoBehaviour:
     rewardItemCounts: 04000000
   type: 2
   camp: 0
-  status: 1
+  status: 0
   title: "\uD14C\uC2A4\uD2B86"
   summary: "2\uBC88 \uC544\uC774\uD15C\uC744 0\uBC88 NPC\uC5D0\uAC8C 1\uAC1C \uC804\uB2EC\uD558\uB294
     \uD018\uC2A4\uD2B8"

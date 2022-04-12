@@ -102,6 +102,14 @@ public class InventoryObject : ScriptableObject
         }
     }
 
+    public void ClearInventory()
+    {
+        foreach (InventorySlot slot in Slots)
+        {
+            slot.UpdateSlot(null, 0);
+        }
+    }
+
     public void UseItem(InventorySlot slot)
     {
         if (slot.ItemObject == null || slot.item.id < 0 || slot.amount <= 0)

@@ -59,6 +59,31 @@ public class StatsObject : ScriptableObject
         }
     }
 
+    public void ResetStats()
+    {
+        for (StatusType type = StatusType.HP; type <= StatusType.Thirst; type++)
+        {
+            statuses[type].maxValue = 100;
+            statuses[type].currentValue = 100;
+        }
+        for (AttributeType type = AttributeType.CON; type <= AttributeType.DEF; type++)
+        {
+            attributes[type].baseValue = 10;
+            attributes[type].modifiedValue = 10;
+            attributes[type].exp = 0;
+        }
+        for (AttributeType type = AttributeType.Handiness; type <= AttributeType.Cooking; type++)
+        {
+            attributes[type].baseValue = 1;
+            attributes[type].modifiedValue = 1;
+            attributes[type].exp = 0;
+        }
+        for (ConditionType type = ConditionType.SwallowWound; type <= ConditionType.MentalBreakdown; type++)
+        {
+            DeactivateCondition(type);
+        }
+    }
+
     public int CountActivatedConditions()
     {
         int count = 0;

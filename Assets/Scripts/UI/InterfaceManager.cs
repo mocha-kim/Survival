@@ -47,13 +47,13 @@ public class InterfaceManager : MonoBehaviour
     {
         if (Input.GetKeyDown(escapeKey))
         {
-            if (activeUIs.Count > 0)
-            {
-                CloseUI(activeUIs[activeUIs.Count - 1]);
-            }
-            else if (DialogueManager.Instance.dialogueActive)
+            if (DialogueManager.Instance.dialogueActive)
             {
                 DialogueManager.Instance.OutOfRange();
+            }
+            else if (activeUIs.Count > 0)
+            {
+                CloseUI(activeUIs[activeUIs.Count - 1]);
             }
             else
             {

@@ -23,7 +23,7 @@ MonoBehaviour:
     rewardItemCounts: 
   type: 1
   camp: 0
-  status: 2
+  status: 0
   title: "\uD14C\uC2A4\uD2B84"
   summary: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
   description: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294

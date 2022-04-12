@@ -10,22 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c7c0fec3ef465412f86fe7661a2ca09d, type: 3}
-  m_Name: TestQuest9
+  m_Name: TestTest
   m_EditorClassIdentifier: 
   data:
-    id: 8
+    id: -1
     targetID: 0
     destNPCID: 0
     currentCount: 0
-    goalCount: 1
-    rewardGold: 0
-    rewardItemIds: 00000000
-    rewardItemCounts: 04000000
-  type: 2
-  camp: 2
+    goalCount: 2
+    rewardGold: 100
+    rewardItemIds: 0000000001000000
+    rewardItemCounts: 0100000001000000
+  type: 1
+  camp: 1
   status: 0
-  title: "\uD14C\uC2A4\uD2B89"
-  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 0\uBC88 NPC\uC5D0\uAC8C 1\uAC1C \uC804\uB2EC\uD558\uB294
-    \uD018\uC2A4\uD2B8"
-  description: "0\uBC88 \uC544\uC774\uD15C\uC744 0\uBC88 NPC\uC5D0\uAC8C 1\uAC1C
-    \uC804\uB2EC\uD558\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  title: TestTest
+  summary: summary123
+  description: 1233241342315

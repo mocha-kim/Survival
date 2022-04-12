@@ -27,6 +27,7 @@ public class TimeManager : MonoBehaviour
     private int thirstReduceStandardTime = 100;
     private float thirstReduceConstValue;
 
+    [SerializeField]
     private ClockUI clock;
     private StatsObject playerStats;
 

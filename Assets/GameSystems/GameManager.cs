@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -8,6 +5,8 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
     public static GameManager Instance => instance;
+
+    public string playerName = "";
 
     public StatsObject playerStats;
     public InventoryObject inventory;
@@ -109,23 +108,73 @@ public class GameManager : MonoBehaviour
 #endif
     }
 
-    public void SaveGame()
+    public SaveLoad.Code NewGame(string playerName)
     {
-        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Player/playerStats");
-        SaveLoad.SaveData(QuestManager.Instance.playerQuests, Application.persistentDataPath + "/Player/playerQuests");
-        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Inventory/inventory");
-        SaveLoad.SaveData(playerStats, Application.persistentDataPath + "/Inventory/quickslot");
+        if (string.IsNullOrWhiteSpace(playerName) || playerName.Length > 10) return SaveLoad.Code.Empty;
+        if (SaveLoad.IsAlreadyExist(Application.persistentDataPath + "/PlayerData/" + playerName + "_s")) return SaveLoad.Code.AlreadyExist;
 
-        Debug.Log("! Game Saved !");
+        bool success = true;
+
+        playerStats.ResetStats();
+        QuestManager.Instance.playerQuests.ResetQuests();
+        inventory.ClearInventory();
+        quickslot.ClearInventory();
+
+        SaveLoad.CreateDataDerectory();
+        success = SaveLoad.SaveData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(quickslot, "/PlayerData/" + playerName + "_qs") == SaveLoad.Code.Success && success;
+
+        if (success)
+        {
+            this.playerName = playerName;
+            Debug.Log("! Game Data Created !");
+            return SaveLoad.Code.Success;
+        }
+        else
+        {
+            Debug.Log("Game Data Creation Failed");
+            return SaveLoad.Code.Failed;
+        }
     }
 
-    public void LoadGame()
+    public void SaveGame()
     {
-        playerStats = SaveLoad.LoadData<StatsObject>(Application.persistentDataPath + "/Player/playerStats");
-        QuestManager.Instance.playerQuests = SaveLoad.LoadData<QuestDataContainer>(Application.persistentDataPath + "/Player/playerQuests");
-        inventory = SaveLoad.LoadData<InventoryObject>(Application.persistentDataPath + "/Inventory/inventory");
-        quickslot = SaveLoad.LoadData<InventoryObject>(Application.persistentDataPath + "/Inventory/quickslot");
+        bool success = true;
 
-        Debug.Log("! Game Loaded !");
+        success = SaveLoad.SaveData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(quickslot, "/PlayerData/" + playerName + "_qs") == SaveLoad.Code.Success && success;
+
+        if (success)
+        {
+            Debug.Log("! Game Data Saved !");
+        }
+        else
+        {
+            Debug.Log("Game Data Save failed");
+        }
+    }
+
+    public void LoadGame(string playerName)
+    {
+        bool success = true;
+
+        success = SaveLoad.LoadData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
+        success = SaveLoad.LoadData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
+        success = SaveLoad.LoadData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
+        success = SaveLoad.LoadData(quickslot, "/PlayerData/" + playerName + "_qs") == SaveLoad.Code.Success && success;
+
+        if (success)
+        {
+            this.playerName = playerName;
+            Debug.Log("! Game Data Loaded !");
+        }
+        else
+        {
+            Debug.Log("Game Data Loading failed");
+        }
     }
 }

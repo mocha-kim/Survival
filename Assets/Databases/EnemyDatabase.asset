@@ -21,3 +21,19 @@ MonoBehaviour:
     conExp: 15
     strExp: 15
     defExp: 15
+  - id: 1
+    name: Zombie
+    maxHP: 100
+    currentHP: 100
+    damage: 10
+    conExp: 15
+    strExp: 15
+    defExp: 15
+  - id: 2
+    name: Zombie
+    maxHP: 100
+    currentHP: 100
+    damage: 10
+    conExp: 15
+    strExp: 15
+    defExp: 15

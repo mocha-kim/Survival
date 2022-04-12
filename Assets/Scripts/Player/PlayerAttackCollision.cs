@@ -21,6 +21,7 @@ public class PlayerAttackCollision : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             other.GetComponent<EnemyController>().OnHit(playerStat.attributes[AttributeType.STR].modifiedValue);
+            playerStat.AddAttributeExp(AttributeType.STR, 5);
         }
     }
 

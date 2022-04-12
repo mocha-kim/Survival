@@ -16,14 +16,14 @@ MonoBehaviour:
     id: 1
     targetID: 1
     destNPCID: 0
-    currentCount: 22
+    currentCount: 0
     goalCount: 5
     rewardGold: 10
     rewardItemIds: 0000000002000000
     rewardItemCounts: 0500000001000000
   type: 1
   camp: 1
-  status: 2
+  status: 1
   title: "\uD14C\uC2A4\uD2B82"
   summary: "1\uBC88 \uC544\uC774\uD15C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
   description: "1\uBC88 \uC544\uC774\uD15C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294

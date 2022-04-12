@@ -6,7 +6,7 @@ public class NPC
 {
     public int id;
     public string name;
-    public string camp;
+    public CampType camp;
 
     public int maxHP;
     public int damage;

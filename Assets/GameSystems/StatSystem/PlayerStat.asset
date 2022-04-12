@@ -19,13 +19,13 @@ MonoBehaviour:
       currentValue: 100
       maxValue: 100
     - type: 1
-      currentValue: 99.33334
+      currentValue: 100
       maxValue: 100
     - type: 2
-      currentValue: 99.86667
+      currentValue: 100
       maxValue: 100
     - type: 3
-      currentValue: 99.86667
+      currentValue: 100
       maxValue: 100
   attributes:
     keys: 0000000001000000020000000300000004000000
@@ -33,23 +33,23 @@ MonoBehaviour:
     - type: 0
       modifiedValue: 10
       baseValue: 10
-      exp: 160
+      exp: 0
     - type: 1
       modifiedValue: 10
       baseValue: 10
-      exp: 160
+      exp: 0
     - type: 2
       modifiedValue: 10
       baseValue: 10
-      exp: 160
+      exp: 0
     - type: 3
       modifiedValue: 1
       baseValue: 1
-      exp: 560
+      exp: 0
     - type: 4
       modifiedValue: 1
       baseValue: 1
-      exp: 560
+      exp: 0
   conditions:
     keys: 000000000100000002000000030000000400000005000000060000000700000008000000
     values:

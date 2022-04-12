@@ -3,15 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary> 키보드 연속 입력 유지 상태 감지 </summary>
+/*
+ * DoubleKeyPress is used player's control
+ * 
+ * [source] : https://rito15.github.io/posts/unity-memo-double-key-press/
+ */
+
 public class DoubleKeyPress
 {
     public KeyCode Key { get; private set; }
-
-    /// <summary> 한 번 눌러서 유지한 상태 </summary>
     public bool SinglePressed { get; private set; }
-
-    /// <summary> 두 번 눌러서 유지한 상태 </summary>
     public bool DoublePressed { get; private set; }
 
     private bool doublePressDetected;
@@ -37,7 +38,6 @@ public class DoubleKeyPress
         doublePressThreshold = seconds > 0f ? seconds : 0f;
     }
 
-    /// <summary> MonoBehaviour.Update()에서 호출 : 키 정보 업데이트 </summary>
     public void Update()
     {
         if (Input.GetKeyDown(Key))
@@ -63,38 +63,9 @@ public class DoubleKeyPress
         }
     }
 
-    /// <summary> MonoBehaviour.Update()에서 호출 : 키 입력에 따른 동작 </summary>
     public void UpdateAction(Action singlePressAction, Action doublePressAction)
     {
         if (SinglePressed) singlePressAction?.Invoke();
         if (DoublePressed) doublePressAction?.Invoke();
     }
 }
-    /*
-    private DoubleKeyPressDetection[] keys;
-
-    private void Start()
-    {
-        keys = new[]
-        {
-        new DoubleKeyPressDetection(KeyCode.W),
-        new DoubleKeyPressDetection(KeyCode.A),
-        new DoubleKeyPressDetection(KeyCode.S),
-        new DoubleKeyPressDetection(KeyCode.D),
-    };
-    }
-
-    private void Update()
-    {
-        for (int i = 0; i < keys.Length; i++)
-        {
-            keys[i].Update();
-        }
-
-        keys[0].UpdateAction(() => Debug.Log("W"), () => Debug.Log("WW"));
-        keys[1].UpdateAction(() => Debug.Log("A"), () => Debug.Log("AA"));
-        keys[2].UpdateAction(() => Debug.Log("S"), () => Debug.Log("SS"));
-        keys[3].UpdateAction(() => Debug.Log("D"), () => Debug.Log("DD"));
-    }
-    */
-    

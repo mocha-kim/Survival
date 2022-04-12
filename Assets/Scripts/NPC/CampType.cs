@@ -1,4 +1,4 @@
-public enum QuestCampType
+public enum CampType
 {
     Lawful,
     Neutral,

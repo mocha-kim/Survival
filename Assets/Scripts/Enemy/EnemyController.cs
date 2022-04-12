@@ -11,6 +11,7 @@ using UnityEngine.AI;
 public enum State
 {
     Idle,
+    Patrol,
     Trace1,
     Trace2,
     Attack,
@@ -27,6 +28,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private GameObject target;
     private Vector3 targetLastPosition;
+    private Vector3 randomPosition;
     [SerializeField]
     private GameObject attackCollision;
     private NavMeshAgent navMeshAgent;
@@ -41,16 +43,23 @@ public class EnemyController : MonoBehaviour
     private int enemyID;
 
     // Movement Control
-    private float distance;
+    private float targetDistance;
+    private float patrolDistance;
     [SerializeField]
     private float traceDistance = 15.0f;
     [SerializeField]
     private float attackDistance = 1.0f;
+    [SerializeField]
+    private float patrolMinDistance = 4.0f;
+    [SerializeField]
+    private float patrolMaxDistance = 6.0f;
 
     // System Setting
     private bool isDead = false;
+    private bool isPatrol = false;
     //private bool isTrack = false;
     private bool isDelay = false;
+    private float patrolDelay = 5f;
     private float attackDelay = 1.755f;
     private float onHitDelay = 2f;
 
@@ -73,30 +82,57 @@ public class EnemyController : MonoBehaviour
     {
         while (!isDead && !playerStat.IsDead)
         {
-            distance = Vector3.Distance(transform.position, target.transform.position);
+            targetDistance = Vector3.Distance(transform.position, target.transform.position);
 
-            if (distance <= attackDistance && !isDelay) // Attack
+            if (!fieldOfView.canSeePlayer) // Idle & Patrol
             {
-                isDelay = true;
-                state = State.Attack;
-                CheckStateForAction();
-                StartCoroutine(Delay(attackDelay));
+                if (!isPatrol && !isDelay) // Patrol
+                {
+                    randomPosition = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+                    randomPosition *= Random.Range(patrolMinDistance, patrolMaxDistance);
+                    isPatrol = true;
+                    state = State.Patrol;
+                }
+
+                patrolDistance = Vector3.Distance(transform.position, randomPosition);
+                if (patrolDistance <= 1f) // Idle
+                {
+                    isDelay = true;
+                    isPatrol = false;
+                    state = State.Idle;
+                    StartCoroutine(Delay(patrolDelay));
+                }
+                    CheckStateForAction();
+            }
+            else if (targetDistance <= attackDistance) // Attack
+            {
+                if (isPatrol || state == State.Idle)
+                {
+                    isPatrol = false;
+                    isDelay = false;
+                }
+                if (!isDelay)
+                {
+                    isDelay = true;
+                    state = State.Attack;
+                    CheckStateForAction();
+                    StartCoroutine(Delay(attackDelay));
+                }
             }
             //else if (distance <= traceDistance || isTrack == true) // using trace2
-            else if (distance <= traceDistance && !isDelay) // 15.0f
+            else if (targetDistance <= traceDistance) // 15.0f
             {
-                if (fieldOfView.canSeePlayer == true)
+                if (isPatrol || state == State.Idle)
+                {
+                    isPatrol = false;
+                    isDelay = false;
+                }
+                if (fieldOfView.canSeePlayer && !isDelay)
                 {
                     state = State.Trace1;
                     CheckStateForAction();
                 }
                 // else if(isTrack == true)                state = State.trace2;
-            }
-
-            if (distance > traceDistance || playerStat.IsDead)
-            {
-                state = State.Idle;
-                CheckStateForAction();
             }
 
             if (database.datas[enemyID].maxHP <= 0)
@@ -105,7 +141,6 @@ public class EnemyController : MonoBehaviour
                 isDead = true;
                 CheckStateForAction();
             }
-
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -119,6 +154,14 @@ public class EnemyController : MonoBehaviour
             case State.Idle:
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
+                break;
+
+            case State.Patrol:
+                navMeshAgent.isStopped = false;
+                targetLastPosition = randomPosition;
+                navMeshAgent.destination = targetLastPosition;
+                animator.SetBool("isTrace", true);
+                //isTrack = true;
                 break;
 
             case State.Trace1:
@@ -152,9 +195,6 @@ public class EnemyController : MonoBehaviour
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
                 animator.SetTrigger("onDying");
-                playerStat.AddAttributeExp(AttributeType.CON, database.datas[enemyID].conExp);
-                playerStat.AddAttributeExp(AttributeType.STR, database.datas[enemyID].strExp);
-                playerStat.AddAttributeExp(AttributeType.DEF, database.datas[enemyID].defExp);
                 gameObject.GetComponent<CapsuleCollider>().enabled = false;
                 break;
         }
@@ -170,12 +210,13 @@ public class EnemyController : MonoBehaviour
     {
         if (!isDead)
         {
-            navMeshAgent.isStopped = true;
-            animator.SetBool("isTrace", false);
             database.datas[enemyID].currentHP -= damage;
 
-            animator.SetTrigger("onHit");
             navMeshAgent.isStopped = true;
+            animator.SetBool("isTrace", false);
+            animator.SetTrigger("onHit");
+            
+            isDelay = true;
             StartCoroutine(Delay(onHitDelay));
         }
     }
