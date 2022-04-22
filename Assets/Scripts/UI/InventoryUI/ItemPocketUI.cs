@@ -5,49 +5,57 @@ using UnityEngine.UI;
 
 public class ItemPocketUI : DynamicInventoryUI
 {
-    [SerializeField]
-    private GameObject viewport;
-    [SerializeField]
-    private ScrollRect scroll;
+    private static ItemPocketUI instance;
+    public static ItemPocketUI Instance => instance;
+
+    // Component
+    public GameObject player;
+    public GameObject pocket;
+    public GameObject inventoryUI;
+    public GameObject itemPocketUI;
+    public GameObject scrollView;
 
     protected float descriptionLength;
+    private float distance;
+    private float viewLength;
 
     protected override void OnEnable()
     {
+        instance = this;
         base.OnEnable();
 
         descriptionLength = description.GetComponent<RectTransform>().sizeDelta.y;
 
         ResizeContent();
-        //ResizeViewport();
     }
 
-    /*
-    private void ResizeViewport()
+    public void ResizeContent()
     {
-        // calc lengthes to resize viewport area
-        float viewportLength = 2 * Mathf.Abs(start.y) + (inventoryObject.Slots.Length / colNum) * (slotSize + space.y) - space.y;
-        float tempLength = isDescriptionOpened ? viewportLength - (descriptionLength + 2 * Mathf.Abs(start.y)) : viewportLength;
-
-        viewport.GetComponent<RectTransform>().sizeDelta = new Vector2(0, tempLength);
-    }
-    */
-
-    private void ResizeContent()
-    {
-        // calc lengthes to resize content area
-        float contentLength = Mathf.Abs(start.y) + (inventoryObject.Slots.Length / colNum) * (slotSize + space.y) - space.y;
-
-        slotParent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentLength);
+        // calc lengthes to resize length area
+        viewLength = Mathf.Abs(start.y) + (inventoryObject.Slots.Length / colNum) * (slotSize + space.y) + 2 * space.y;
     }
 
     protected override void EnableDescription()
     {
         base.EnableDescription();
+        scrollView.GetComponent<RectTransform>().sizeDelta = new Vector2(0, viewLength + descriptionLength + space.y);
+        scrollView.GetComponent<RectTransform>().position = new Vector2(transform.position.x, transform.position.y);
     }
 
     protected override void DisableDescription()
     {
         base.DisableDescription();
+        scrollView.GetComponent<RectTransform>().sizeDelta = new Vector2(0, viewLength);
+        scrollView.GetComponent<RectTransform>().position = new Vector2(transform.position.x, transform.position.y + 23.2812f);
+    }
+
+    public void TogglePocketUI()
+    {
+        distance = Vector3.Distance(pocket.transform.position, player.transform.position);
+        if (distance <= 2.5f)
+        {
+            InterfaceManager.Instance.ToggleUI(inventoryUI);
+            InterfaceManager.Instance.ToggleUI(itemPocketUI);
+        }
     }
 }

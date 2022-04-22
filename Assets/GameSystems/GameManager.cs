@@ -6,16 +6,16 @@ public class GameManager : MonoBehaviour
     private static GameManager instance;
     public static GameManager Instance => instance;
 
-    public string playerName = "";
+    public GameDataContainer gameData;
 
     public StatsObject playerStats;
     public InventoryObject inventory;
     public InventoryObject quickslot;
 
-    public int selectedQuickslot = 0;
-
-    public ItemDatabase itemDatabase;
-    public EnemyDatabase enemyDatabase;
+    [SerializeField]
+    private ItemDatabase itemDatabase;
+    [SerializeField]
+    private EnemyDatabase enemyDatabase;
 
     private bool isGamePlaying = true;
     public bool IsGamePlaying
@@ -58,9 +58,9 @@ public class GameManager : MonoBehaviour
     public string GetItemName(int id) => itemDatabase.itemObjects.FirstOrDefault(i => i.data.id == id)?.data.name;
     public bool IsItemStackable(int itemId) => itemDatabase.itemObjects.FirstOrDefault(i => i.data.id == itemId).isStackable;
 
-    public string GetEnemyName(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id)?.name;
-    public Enemy GetEnemyData(int id) => enemyDatabase.datas.FirstOrDefault(i => i.id == id);
-    public Enemy GetEnemyData(string name) => enemyDatabase.datas.FirstOrDefault(i => i.name == name);
+    public string GetEnemyName(int id) => enemyDatabase.data.FirstOrDefault(i => i.id == id)?.name;
+    public Enemy GetEnemyData(int id) => enemyDatabase.data.FirstOrDefault(i => i.id == id);
+    public Enemy GetEnemyData(string name) => enemyDatabase.data.FirstOrDefault(i => i.name == name);
 
 
     public int GetTotalItemCount(int id)
@@ -115,12 +115,14 @@ public class GameManager : MonoBehaviour
 
         bool success = true;
 
+        gameData.ResetData(playerName);
         playerStats.ResetStats();
         QuestManager.Instance.playerQuests.ResetQuests();
         inventory.ClearInventory();
         quickslot.ClearInventory();
 
-        SaveLoad.CreateDataDerectory();
+        SaveLoad.CreateDataDirectory();
+        success = SaveLoad.SaveData(gameData, "/PlayerData/" + playerName + "_g") == SaveLoad.Code.Success && success;
         success = SaveLoad.SaveData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
         success = SaveLoad.SaveData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
         success = SaveLoad.SaveData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
@@ -128,7 +130,7 @@ public class GameManager : MonoBehaviour
 
         if (success)
         {
-            this.playerName = playerName;
+            gameData.playerName = playerName;
             Debug.Log("! Game Data Created !");
             return SaveLoad.Code.Success;
         }
@@ -139,14 +141,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ResetGame()
+    {
+        gameData.ResetData(gameData.playerName);
+        playerStats.ResetStats();
+        QuestManager.Instance.playerQuests.ResetQuests();
+        inventory.ClearInventory();
+        quickslot.ClearInventory();
+
+        SaveGame();
+    }
+
     public void SaveGame()
     {
         bool success = true;
 
-        success = SaveLoad.SaveData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
-        success = SaveLoad.SaveData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
-        success = SaveLoad.SaveData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
-        success = SaveLoad.SaveData(quickslot, "/PlayerData/" + playerName + "_qs") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(gameData, "/PlayerData/" + gameData.playerName + "_g") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(playerStats, "/PlayerData/" + gameData.playerName + "_s") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(QuestManager.Instance.playerQuests, "/PlayerData/" + gameData.playerName + "_q") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(inventory, "/PlayerData/" + gameData.playerName + "_i") == SaveLoad.Code.Success && success;
+        success = SaveLoad.SaveData(quickslot, "/PlayerData/" + gameData.playerName + "_qs") == SaveLoad.Code.Success && success;
 
         if (success)
         {
@@ -162,6 +176,7 @@ public class GameManager : MonoBehaviour
     {
         bool success = true;
 
+        success = SaveLoad.SaveData(gameData, "/PlayerData/" + playerName + "_g") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;
@@ -169,12 +184,17 @@ public class GameManager : MonoBehaviour
 
         if (success)
         {
-            this.playerName = playerName;
+            gameData.playerName = playerName;
             Debug.Log("! Game Data Loaded !");
         }
         else
         {
             Debug.Log("Game Data Loading failed");
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGame();
     }
 }

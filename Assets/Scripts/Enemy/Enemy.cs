@@ -1,17 +1,30 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class Enemy
+[CreateAssetMenu(fileName = "Enemy", menuName = "Database/Enemy")]
+public class Enemy : ScriptableObject
 {
     public int id;
-    public string name;
+    public new string name;
 
     public float maxHP;
     public float currentHP;
     public float damage;
 
-    public float conExp;
-    public float strExp;
-    public float defExp;
+    public int rewardGold;
+    public List<RewardItem> rewardItem;
+
+    [System.Serializable]
+    public struct RewardItem
+    {
+        public ItemObject item;
+        public int count;
+        [Range(0, 100)]
+        public int percentage;
+    }
+
+    public Enemy()
+    {
+        id = -1;
+    }
 }

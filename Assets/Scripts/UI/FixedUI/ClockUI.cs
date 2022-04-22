@@ -21,35 +21,32 @@ public class ClockUI : MonoBehaviour
     private int maxValue = 12;
     private int calcValue;
 
-    private float TimeLeft => TimeManager.Instance.GetTimeLeft();
-    private bool IsDaytime => TimeManager.Instance.GetIsDaytime();
+    private bool IsAM => TimeManager.Instance.GetIsAM();
 
     private void Start()
     {
         // init image components
-        fill.color = IsDaytime ? fillColors[0] : fillColors[1];
-        dayText.color = IsDaytime ? textColors[0] : textColors[1];
+        fill.color = IsAM ? fillColors[0] : fillColors[1];
+        dayText.color = IsAM ? textColors[0] : textColors[1];
 
         // init clock vlaues
         clock = GetComponent<Slider>();
         calcValue = maxValue;
         clock.maxValue = maxValue;
         clock.value = maxValue;
+
+        TimeManager.Instance.OnTheHour += OnTheHour;
     }
 
-    private void Update()
+    public void OnTheHour(int hour)
     {
-        calcValue = (int)Mathf.Ceil(TimeLeft / (float)TimeManager.Instance.GetRealtimePerHour());
-        if (clock.value > calcValue)
-        {
-            clock.value = calcValue;
-        }
+        clock.value = 12 - hour;
     }
 
     public void UpdateClockUI()
     {
-        fill.color = IsDaytime ? fillColors[0] : fillColors[1];
-        dayText.color = IsDaytime ? textColors[0] : textColors[1];
+        fill.color = IsAM ? fillColors[0] : fillColors[1];
+        dayText.color = IsAM ? textColors[0] : textColors[1];
         dayText.text = "DAY " + TimeManager.Instance.GetDay();
         calcValue = maxValue;
         clock.value = maxValue;

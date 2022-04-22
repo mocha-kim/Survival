@@ -37,7 +37,7 @@ public class QuickslotsUI : InventoryUI
 
     private void Start()
     {
-        SelectSlot(GameManager.Instance.selectedQuickslot);
+        SelectSlot(GameManager.Instance.gameData.selectedQuickslot);
     }
 
     private void Update()
@@ -68,7 +68,6 @@ public class QuickslotsUI : InventoryUI
 
         previousSlot = staticSlots[index];
         staticSlots[index].GetComponentInChildren<Image>().sprite = slotBackgounds[1];
-        GameManager.Instance.selectedQuickslot = index;
     }
 
     private void UseSlotItem(int index)

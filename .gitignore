@@ -106,6 +106,11 @@ crashlytics-build.properties
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
+# Downloaded Assets
+/[Aa]ssets/Low Poly Icon Pack/
+/[Ad]ssets/Low Pily Ultimate Pack/
+/[Ad]ssets/Polygon Arsenal/
+
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
@@ -113,7 +118,6 @@ crashlytics-build.properties
 /[Aa]ssets/AnimateController/
 /[Aa]ssets/Animation/
 /[Aa]ssets/AudioClips/
-/[Aa]ssets/DownloadedAsset/
 /[Aa]ssets/Model/
 /[Aa]ssets/Prefabs/
 /[Aa]ssets/Scenes/

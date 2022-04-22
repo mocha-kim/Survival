@@ -75,8 +75,7 @@ public class InterfaceManager : MonoBehaviour
         }
         if (Input.GetKeyDown(pickUpKey) && GameManager.Instance.IsGamePlaying)
         {
-            //ToggleUI(inventoryUI);
-            //ToggleUI(itemPocketUI);
+            ItemPocketUI.Instance.TogglePocketUI();
         }
     }
 

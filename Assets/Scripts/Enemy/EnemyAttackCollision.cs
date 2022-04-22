@@ -23,7 +23,7 @@ public class EnemyAttackCollision : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerController>().OnHit(database.datas[enemyID].damage);
+            other.GetComponent<PlayerController>().OnHit(database.data[enemyID].damage);
         }
     }
 

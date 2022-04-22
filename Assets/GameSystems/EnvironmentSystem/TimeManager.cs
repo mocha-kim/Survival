@@ -14,8 +14,11 @@ public class TimeManager : MonoBehaviour
     [SerializeField]
     private float timeLeft;
     private float halftimeOfDay;
-    private bool isDaytime;
+    private bool isAM;
+    [SerializeField]
     private int day;
+    [SerializeField]
+    private int hour;
 
     [SerializeField]
     private int spReduceStandardTime = 20;
@@ -31,10 +34,12 @@ public class TimeManager : MonoBehaviour
     private ClockUI clock;
     private StatsObject playerStats;
 
-    public float GetRealtimePerHour() => realtimePerHour;
-    public float GetTimeLeft() => timeLeft;
-    public bool GetIsDaytime() => isDaytime;
     public int GetDay() => day;
+    public int GetHour() => hour;
+    public bool GetIsAM() => isAM;
+    public float GetHalftime() => halftimeOfDay;
+
+    public Action<int> OnTheHour;
 
     private void Awake()
     {
@@ -59,9 +64,9 @@ public class TimeManager : MonoBehaviour
         thirstReduceConstValue = 100 / (realtimePerHour * thirstReduceStandardTime);
 
         // get time data from file
-        timeLeft = halftimeOfDay;
-        isDaytime = true;
-        day = 1;
+        timeLeft = GameManager.Instance.gameData.timeLeft;
+        isAM = GameManager.Instance.gameData.isAM;
+        day = GameManager.Instance.gameData.day;
 
         StartCoroutine(ReduceStaminaByTime());
     }
@@ -69,12 +74,16 @@ public class TimeManager : MonoBehaviour
     private void Update()
     {
         timeLeft -= Time.deltaTime;
-
+        if (12 - (int)Mathf.Ceil(timeLeft / realtimePerHour) != hour)
+        {
+            hour = 12 - (int)Mathf.Ceil(timeLeft / realtimePerHour);
+            OnTheHour?.Invoke(hour);
+        }
         if (timeLeft <= 0)
         {
             timeLeft = halftimeOfDay;
-            isDaytime = !isDaytime;
-            day = isDaytime ? day + 1 : day;
+            isAM = !isAM;
+            day = isAM ? day + 1 : day;
             clock.UpdateClockUI();  
         }
     }
@@ -88,5 +97,12 @@ public class TimeManager : MonoBehaviour
             playerStats.AddStatusCurrentValue(StatusType.Hunger, -hungerReduceConstValue);
             playerStats.AddStatusCurrentValue(StatusType.Thirst, -thirstReduceConstValue);
         }
+    }
+
+    public void ResetTime()
+    {
+        timeLeft = GameManager.Instance.gameData.timeLeft = halftimeOfDay;
+        isAM = GameManager.Instance.gameData.isAM = true;
+        day = GameManager.Instance.gameData.day = 1;
     }
 }

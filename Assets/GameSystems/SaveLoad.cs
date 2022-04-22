@@ -31,7 +31,7 @@ public static class SaveLoad
         }
     }
 
-    public static void CreateDataDerectory()
+    public static void CreateDataDirectory()
     {
         if (!Directory.Exists(Application.persistentDataPath + "/PlayerData/"))
         {

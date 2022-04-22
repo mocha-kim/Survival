@@ -40,6 +40,10 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private EnemyDatabase database;
     [SerializeField]
+    private GameObject pocketObject;
+    [SerializeField]
+    private ItemPocket itemPocket;
+    [SerializeField]
     private int enemyID;
 
     // Movement Control
@@ -73,7 +77,8 @@ public class EnemyController : MonoBehaviour
     private void Start()
     {
         playerStat = GameManager.Instance.playerStats;
-        database.datas[enemyID].currentHP = database.datas[enemyID].maxHP;
+        database.data[enemyID].currentHP = database.data[enemyID].maxHP;
+        itemPocket.GenEnemyItem(enemyID);
 
         StartCoroutine(CheckState());
     }
@@ -135,7 +140,7 @@ public class EnemyController : MonoBehaviour
                 // else if(isTrack == true)                state = State.trace2;
             }
 
-            if (database.datas[enemyID].maxHP <= 0)
+            if (database.data[enemyID].currentHP <= 0)
             {
                 state = State.Dead;
                 isDead = true;
@@ -196,6 +201,10 @@ public class EnemyController : MonoBehaviour
                 animator.SetBool("isTrace", false);
                 animator.SetTrigger("onDying");
                 gameObject.GetComponent<CapsuleCollider>().enabled = false;
+                GameObject obj = Instantiate(pocketObject);
+                obj.name = "ItemPocket";
+                Vector3 pos = transform.position + new Vector3(0, 0.5f, 0);
+                obj.transform.position = pos;
                 break;
         }
     }
@@ -210,7 +219,7 @@ public class EnemyController : MonoBehaviour
     {
         if (!isDead)
         {
-            database.datas[enemyID].currentHP -= damage;
+            database.data[enemyID].currentHP -= damage;
 
             navMeshAgent.isStopped = true;
             animator.SetBool("isTrace", false);
