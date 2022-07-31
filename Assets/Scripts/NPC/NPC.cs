@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class NPC
+[CreateAssetMenu(fileName = "NPC", menuName = "Database/NPC")]
+public class NPC : ScriptableObject
 {
     public int id;
-    public string name;
+    public new string name;
     public CampType camp;
 
-    public int maxHP;
-    public int damage;
-
     public int friendliness;
-    public string quest;
-    public string dialogue;
+
+    public NPC()
+    {
+        id = -1;
+    }
 }

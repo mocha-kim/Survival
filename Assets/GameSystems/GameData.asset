@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerName: Player
   selectedQuickslot: 0
-  timeLeft: 36
+  timeLeft: 180
   isAM: 1
   day: 1
-  hour: 0
+  hour: 6
   weather: 0
+  sky: 0
   weatherActivationHour: 24
   temperature: -5
   keySettings:
@@ -36,4 +37,7 @@ MonoBehaviour:
     - Down
     - Right
     - Left
-    values: 7300000032010000200000006900000066000000630000006a000000650000007100000077000000320100006400000061000000
+    values: 3001000032010000200000006900000066000000630000006a000000650000007100000077000000730000006400000061000000
+  masterVol: 0
+  bgmVol: -19
+  sfxVol: 0

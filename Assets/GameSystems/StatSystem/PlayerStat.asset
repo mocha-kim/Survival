@@ -16,16 +16,16 @@ MonoBehaviour:
     keys: 00000000010000000200000003000000
     values:
     - type: 0
-      currentValue: 100
+      currentValue: 90.90909
       maxValue: 100
     - type: 1
-      currentValue: 100
+      currentValue: 0
       maxValue: 100
     - type: 2
-      currentValue: 100
+      currentValue: 92.46678
       maxValue: 100
     - type: 3
-      currentValue: 100
+      currentValue: 92.46678
       maxValue: 100
   attributes:
     keys: 0000000001000000020000000300000004000000
@@ -33,15 +33,15 @@ MonoBehaviour:
     - type: 0
       modifiedValue: 10
       baseValue: 10
-      exp: 0
+      exp: 30
     - type: 1
       modifiedValue: 10
       baseValue: 10
-      exp: 0
+      exp: 55
     - type: 2
       modifiedValue: 10
       baseValue: 10
-      exp: 0
+      exp: 5
     - type: 3
       modifiedValue: 1
       baseValue: 1
@@ -91,7 +91,7 @@ MonoBehaviour:
       activationTime: 0
     - type: 6
       effects: []
-      icon: {fileID: 21300000, guid: 33f0cc9937d99a14eaf9e2ac481ab628, type: 3}
+      icon: {fileID: 21300000, guid: 9a10fb8f5efdbd74f8a15875334cd987, type: 3}
       isActive: 0
       needTreatment: 0
       activationTime: 0

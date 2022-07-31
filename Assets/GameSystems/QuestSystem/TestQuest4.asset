@@ -16,15 +16,15 @@ MonoBehaviour:
     id: 3
     targetID: 0
     destNPCID: 0
-    currentCount: 10
+    currentCount: 0
     goalCount: 7
     rewardGold: 70
     rewardItemIds: 
     rewardItemCounts: 
+    updateFriendliness: []
   type: 1
   camp: 0
   status: 0
-  title: "\uD14C\uC2A4\uD2B84"
-  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
-  description: "0\uBC88 \uC544\uC774\uD15C\uC744 7\uAC1C \uAC00\uC838\uC624\uB294
-    \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  title: "\uC694\uB9AC \uC7AC\uB8CC\uAC00 \uD544\uC694\uD574!"
+  summary: "\uAC10\uC790\uB97C 7\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
+  description: "\uAC10\uC790\uB97C 7\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

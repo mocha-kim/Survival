@@ -69,7 +69,7 @@ public class InventorySlot
 
     public bool AllowedToPlace(ItemObject itemObject)
     {
-        if (allowedType.Length <= 0 || itemObject == null || itemObject.data.id < 0)
+        if (allowedType == null || allowedType.Length <= 0 || itemObject == null || itemObject.data.id < 0)
         {
             return true;
         }

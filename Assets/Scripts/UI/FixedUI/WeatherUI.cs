@@ -12,11 +12,11 @@ public class WeatherUI : MonoBehaviour
 
     void Start()
     {
-        WeatherManager.Instance.OnChangeWeather += OnChangeWeather;
+        TimeManager.Instance.OnChangeWeather += OnChangeWeather;
         OnChangeWeather(GameManager.Instance.gameData.weather, GameManager.Instance.gameData.temperature);
     }
 
-    public void OnChangeWeather(WeatherType weather, float temperature)
+    public void OnChangeWeather(WeatherType weather, float temperature, bool is_changed = true)
     {
         weatherText.text = weather.ToString();
         temperatureText.text = temperature.ToString("f1") + "°C";

@@ -1,56 +1,104 @@
 using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
 public class ItemPocket : MonoBehaviour
 {
     // Component
-    public EnemyDatabase database;
-    public ItemDatabase itemDatabase;
     public InventoryObject inventoryObject;
 
-    public int pocketID = -1;
-    public float distance;
-    private int itemID;
-    private int itemCount;
+    // UI
+    [SerializeField]
+    private GameObject inventoryUIGO;
+    [SerializeField]
+    private GameObject itemPocketUIGO;
+    [SerializeField]
+    private ItemPocketUI itemPocketUI;
 
-    public void Interact(PlayerController player)
+    private int destroyTime = 180;
+    private bool isPlayerEnter = false;
+    private bool isInventoryOpen = false;
+    private bool isItemPocketOpen = false;
+
+    private void Start()
     {
-        throw new System.NotImplementedException();
+        inventoryUIGO = InterfaceManager.Instance.inventoryUI;
+        itemPocketUIGO = InterfaceManager.Instance.itemPocketUI;
+        itemPocketUI = itemPocketUIGO.GetComponent<ItemPocketUI>();
+
+        StartCoroutine(DestroyItemPocket(destroyTime));
     }
 
-    public void StopInteract(PlayerController player)
+    private void OnTriggerEnter(Collider other)
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void GenEnemyItem(int enemyID)
-    {
-        Enemy enemy = database.data[enemyID];
-        GenItemPocket(enemy);
-    }
-
-    public void GenItemPocket(Enemy enemy)
-    {
-        pocketID++;
-        for (int i = 0; i < enemy.rewardItem.Count; i++)
+        if (other.CompareTag("Player"))
         {
-            itemCount = 0;
-            itemID = enemy.rewardItem[i].item.data.id;
+            isPlayerEnter = true;
+        }
+    }
 
-            for (int j = 0; j < enemy.rewardItem[i].count; j++)
+    private void OnTriggerExit(Collider other)
+    {
+        isPlayerEnter = false;
+
+        InterfaceManager.Instance.activeUIs.Remove(inventoryUIGO);
+        InterfaceManager.Instance.activeUIs.Remove(itemPocketUIGO);
+        inventoryUIGO.SetActive(false);
+        itemPocketUIGO.SetActive(false);
+    }
+
+    private void Update()
+    {
+        isInventoryOpen = inventoryUIGO.activeSelf;
+        isItemPocketOpen = itemPocketUIGO.activeSelf;
+
+        if (!isItemPocketOpen && inventoryObject.EmptySlotCount == inventoryObject.Slots.Length)
+        {
+            StartCoroutine(DestroyItemPocket(0f));
+        }
+
+        if (isPlayerEnter && Input.GetKeyDown(KeyCode.F))
+        {
+            itemPocketUI.SetInventoryObject(inventoryObject);
+
+            if (isInventoryOpen && isItemPocketOpen)
             {
-                if (Random.Range(0, 100) <= enemy.rewardItem[i].percentage)
-                {
-                    itemCount++;
-                }
+                InterfaceManager.Instance.activeUIs.Remove(inventoryUIGO);
+                InterfaceManager.Instance.activeUIs.Remove(itemPocketUIGO);
+
+                inventoryUIGO.SetActive(false);
+                itemPocketUIGO.SetActive(false);
             }
-            if(itemCount > 0)
+
+            if (!isInventoryOpen)
             {
-                inventoryObject.Slots[i].UpdateSlot(itemDatabase.GetItem(itemID), itemCount);
-                //genPockets[pocketID].Slots[i].UpdateSlot(itemDatabase.GetItem(itemID), itemCount);
+                inventoryUIGO.SetActive(true);
+                InterfaceManager.Instance.activeUIs.Add(inventoryUIGO);
+
+                inventoryUIGO.transform.SetAsLastSibling();
+            }
+
+            if (!isItemPocketOpen)
+            {
+                itemPocketUIGO.SetActive(true);
+                InterfaceManager.Instance.activeUIs.Add(itemPocketUIGO);
+
+                itemPocketUIGO.transform.SetAsLastSibling();
             }
         }
+    }
+
+    public void SetInventoryObject(InventoryObject inventory)
+    {
+        inventoryObject = inventory;
+    }
+
+    private IEnumerator DestroyItemPocket(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        Destroy(gameObject);
+        ItemPocketGenerator.Instance.DeleteItemPocket(inventoryObject);
     }
 }

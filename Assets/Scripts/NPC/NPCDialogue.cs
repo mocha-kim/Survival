@@ -1,6 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 /*
  * NPCScript is players and NPCs interact trigger
@@ -10,7 +8,7 @@ using UnityEngine.UI;
  * https://www.youtube.com/watch?v=p4a_OYmk1uU
  */
 
-public class NPCDialogue : MonoBehaviour, IInteractable
+public class NPCDialogue : MonoBehaviour
 {
     // Component
     public GameObject Dialogue;
@@ -19,59 +17,69 @@ public class NPCDialogue : MonoBehaviour, IInteractable
     private QuestDialogue questDialogue;
 
     // NPC Name and Dialogue
-    public string NPCName;
+    [SerializeField]
+    private NPCDatabase database;
+    [SerializeField]
+    private int npcID;
     [TextArea(5, 10)]
     public string[] sentences;
 
     [SerializeField]
     private float distance = 10;
     public float Distance => distance;
+    private bool isPlayerEnter = false;
 
     void Start()
     {
         npcDialogue = GetComponent<NPCDialogue>();
         questDialogue = GetComponent<QuestDialogue>();
+        NPCCharacter = gameObject;
     }
 
-    public void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (questDialogue == null)
+        if (other.CompareTag("Player"))
         {
+            isPlayerEnter = true;
             npcDialogue.enabled = true;
             DialogueManager.Instance.EnterRangeOfNPC();
-            if (other.CompareTag("Player") && Input.GetKeyDown(KeyCode.F))
-            {
-                npcDialogue.enabled = true;
-                DialogueManager.Instance.names = NPCName;
-                DialogueManager.Instance.StartDialogue(in sentences);
-            }
-        }
-        else if (!questDialogue.isStartQuestDialogue && questDialogue.questObject.status == QuestStatus.Rewarded)
-        {
-            npcDialogue.enabled = true;
-            DialogueManager.Instance.EnterRangeOfNPC();
-            if (other.CompareTag("Player") && Input.GetKeyDown(KeyCode.F))
-            {
-                npcDialogue.enabled = true;
-                DialogueManager.Instance.names = NPCName;
-                DialogueManager.Instance.StartDialogue(in sentences);
-            }
         }
     }
 
-    public void OnTriggerExit()
+    private void OnTriggerExit()
     {
+        isPlayerEnter = false;
         DialogueManager.Instance.OutOfRange();
         npcDialogue.enabled = false;
     }
 
-    public void Interact(PlayerController player)
+    private void Update()
     {
-        throw new System.NotImplementedException();
-    }
+        if (isPlayerEnter)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
 
-    public void StopInteract(PlayerController player)
-    {
-        throw new System.NotImplementedException();
+            if (questDialogue == null)
+            {
+                npcDialogue.enabled = true;
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    npcDialogue.enabled = true;
+                    DialogueManager.Instance.names = database.datas[npcID].name;
+                    DialogueManager.Instance.StartDialogue(in sentences);
+                }
+            }
+            else if (!questDialogue.isStartQuestDialogue && questDialogue.questObject.status == QuestStatus.Rewarded)
+            {
+                npcDialogue.enabled = true;
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    npcDialogue.enabled = true;
+                    DialogueManager.Instance.names = database.datas[npcID].name;
+                    DialogueManager.Instance.StartDialogue(in sentences);
+                }
+            }
+        }
     }
 }

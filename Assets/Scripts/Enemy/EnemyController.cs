@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Audio;
+
 /*
  * EnemyController is player's attack collision
  * This can receive an attack signal from the player
@@ -8,77 +10,80 @@ using UnityEngine.AI;
  * This manages on hit animation
  */
 
-public enum State
-{
-    Idle,
-    Patrol,
-    Trace1,
-    Trace2,
-    Attack,
-    Hit,
-    Dead,
-};
 
 public class EnemyController : MonoBehaviour
 {
     // State
-    private State state = State.Idle;
+    private EnemyState state;
 
     // Component
     [SerializeField]
     private GameObject target;
-    private Vector3 targetLastPosition;
-    private Vector3 randomPosition;
     [SerializeField]
     private GameObject attackCollision;
+    private EnemyAttackCollision enemyAttackCollision;
     private NavMeshAgent navMeshAgent;
     private Animator animator;
     private FieldOfView fieldOfView;
     private StatsObject playerStat;
 
     // Enemy Database
-    [SerializeField]
-    private EnemyDatabase database;
-    [SerializeField]
-    private GameObject pocketObject;
-    [SerializeField]
-    private ItemPocket itemPocket;
+    private Enemy info;
     [SerializeField]
     private int enemyID;
 
     // Movement Control
+    private Vector3 targetLastPosition;
+    private Vector3 randomPosition;
     private float targetDistance;
     private float patrolDistance;
-    [SerializeField]
     private float traceDistance = 15.0f;
-    [SerializeField]
     private float attackDistance = 1.0f;
-    [SerializeField]
     private float patrolMinDistance = 4.0f;
-    [SerializeField]
-    private float patrolMaxDistance = 6.0f;
+    private float patrolMaxDistance = 11.0f;
 
     // System Setting
+    private float currentHP;
     private bool isDead = false;
     private bool isPatrol = false;
-    //private bool isTrack = false;
-    private bool isDelay = false;
-    private float patrolDelay = 5f;
+    private bool isTrace = false;
+    private bool isIdle = false;
+    private bool isAttack = false;
+    private bool isHit = false;
+    private bool isStun = false;
+    private bool isReact = false;
+    private int hitCount = 0;
+    private int reactCount = 0;
+    private float idleDelay = 5f;
     private float attackDelay = 1.755f;
-    private float onHitDelay = 2f;
+    private float hitDelay = 2f;
+    private float reactDelay = 3f;
+
+    [SerializeField]
+    private AudioClip hitClip;
+    private AudioSource audioSource;
+
+    public bool IsDead => isDead;
+    public bool CanSeePlayer => fieldOfView.canSeePlayer;
+    public float GetDistance => Vector3.Distance(transform.position, target.transform.position);
 
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fieldOfView = GetComponent<FieldOfView>();
+        enemyAttackCollision = attackCollision.GetComponent<EnemyAttackCollision>();
+        audioSource = GetComponent<AudioSource>();
+        target = GameObject.FindWithTag("Player");
     }
 
     private void Start()
     {
         playerStat = GameManager.Instance.playerStats;
-        database.data[enemyID].currentHP = database.data[enemyID].maxHP;
-        itemPocket.GenEnemyItem(enemyID);
+        info = GameManager.Instance.GetEnemyData(enemyID);
+        currentHP = info.maxHP;
+        enemyAttackCollision.SetEnemyInfo(info.id);
+        randomPosition = transform.position;
 
         StartCoroutine(CheckState());
     }
@@ -89,60 +94,81 @@ public class EnemyController : MonoBehaviour
         {
             targetDistance = Vector3.Distance(transform.position, target.transform.position);
 
-            if (!fieldOfView.canSeePlayer) // Idle & Patrol
+            if (isStun) // Hit
             {
-                if (!isPatrol && !isDelay) // Patrol
+                if (isHit) // On Hit
                 {
+                    isHit = false;
+                    isReact = true;
+                    state = EnemyState.Hit;
+                    CheckStateForAction();
+                    StartCoroutine(HitDelay(hitDelay));
+                }
+            }
+
+            else if (!CanSeePlayer && !isAttack) // Idle & Patrol
+            {
+                patrolDistance = Vector3.Distance(transform.position, randomPosition);
+
+                if (isReact) // Trace after (Attack, Hit, CanSeePlayer)
+                {
+                    if (isTrace)
+                    {
+                        isPatrol = false;
+                        isTrace = false;
+                        reactCount++;
+                        StartCoroutine(ReactDelay(reactDelay));
+                    }
+                    state = EnemyState.Trace;
+                    CheckStateForAction();
+                }
+
+                else if (isPatrol && patrolDistance <= 1f) // Idle
+                {
+                    isIdle = true;
+                    isPatrol = false;
+                    state = EnemyState.Idle;
+                    StartCoroutine(IdleDelay(idleDelay));
+                    CheckStateForAction();
+                }
+
+                else if (!isPatrol && !isIdle) // Patrol
+                {
+                    isPatrol = true;
+                    state = EnemyState.Patrol;
                     randomPosition = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
                     randomPosition *= Random.Range(patrolMinDistance, patrolMaxDistance);
-                    isPatrol = true;
-                    state = State.Patrol;
-                }
-
-                patrolDistance = Vector3.Distance(transform.position, randomPosition);
-                if (patrolDistance <= 1f) // Idle
-                {
-                    isDelay = true;
-                    isPatrol = false;
-                    state = State.Idle;
-                    StartCoroutine(Delay(patrolDelay));
-                }
-                    CheckStateForAction();
-            }
-            else if (targetDistance <= attackDistance) // Attack
-            {
-                if (isPatrol || state == State.Idle)
-                {
-                    isPatrol = false;
-                    isDelay = false;
-                }
-                if (!isDelay)
-                {
-                    isDelay = true;
-                    state = State.Attack;
-                    CheckStateForAction();
-                    StartCoroutine(Delay(attackDelay));
-                }
-            }
-            //else if (distance <= traceDistance || isTrack == true) // using trace2
-            else if (targetDistance <= traceDistance) // 15.0f
-            {
-                if (isPatrol || state == State.Idle)
-                {
-                    isPatrol = false;
-                    isDelay = false;
-                }
-                if (fieldOfView.canSeePlayer && !isDelay)
-                {
-                    state = State.Trace1;
+                    randomPosition += transform.position;
                     CheckStateForAction();
                 }
-                // else if(isTrack == true)                state = State.trace2;
             }
 
-            if (database.data[enemyID].currentHP <= 0)
+            else if(CanSeePlayer && !isAttack)
             {
-                state = State.Dead;
+                if (targetDistance <= attackDistance) // Attack
+                {
+                    isAttack = true;
+                    isReact = true;
+                    isTrace = true;
+                    isPatrol = false;
+                    state = EnemyState.Attack;
+                    StartCoroutine(AttackDelay(attackDelay));
+                    CheckStateForAction();
+                }
+
+                else if (targetDistance <= traceDistance) // Trace
+                {
+                    isReact = true;
+                    isTrace = true;
+                    isPatrol = false;
+                    state = EnemyState.Trace;
+                    CheckStateForAction();
+                }
+            }
+
+            if (currentHP <= 0)
+            {
+                state = EnemyState.Dead;
                 isDead = true;
                 CheckStateForAction();
             }
@@ -156,12 +182,12 @@ public class EnemyController : MonoBehaviour
     {
         switch (state)
         {
-            case State.Idle:
+            case EnemyState.Idle:
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
                 break;
 
-            case State.Patrol:
+            case EnemyState.Patrol:
                 navMeshAgent.isStopped = false;
                 targetLastPosition = randomPosition;
                 navMeshAgent.destination = targetLastPosition;
@@ -169,7 +195,7 @@ public class EnemyController : MonoBehaviour
                 //isTrack = true;
                 break;
 
-            case State.Trace1:
+            case EnemyState.Trace:
                 navMeshAgent.isStopped = false;
                 targetLastPosition = target.transform.position;
                 navMeshAgent.destination = targetLastPosition;
@@ -177,69 +203,82 @@ public class EnemyController : MonoBehaviour
                 //isTrack = true;
                 break;
 
-                /*
-            case State.trace2:
-                navMeshAgent.isStopped = false;
-                navMeshAgent.destination = targetLastPosition;
-                animator.SetBool("isTrace", true);
-                if (navMeshAgent.remainingDistance < 2.0f)
-                {
-                    animator.SetBool("isTrace", false);
-                    isTrack = false;
-                }
-                break;
-                */
-
-            case State.Attack:
+            case EnemyState.Attack:
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
                 animator.SetTrigger("onAttack");
                 break;
 
-            case State.Dead:
+            case EnemyState.Hit:
+                navMeshAgent.isStopped = true;
+                animator.SetBool("isTrace", false);
+                animator.SetTrigger("onHit");
+                break;
+
+            case EnemyState.Dead:
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isTrace", false);
                 animator.SetTrigger("onDying");
+                ItemPocketGenerator.Instance.GenItemPocket(transform.position, info);
                 gameObject.GetComponent<CapsuleCollider>().enabled = false;
-                GameObject obj = Instantiate(pocketObject);
-                obj.name = "ItemPocket";
-                Vector3 pos = transform.position + new Vector3(0, 0.5f, 0);
-                obj.transform.position = pos;
                 break;
         }
     }
 
-    private IEnumerator Delay(float time)
+    private IEnumerator IdleDelay(float time)
     {
         yield return new WaitForSeconds(time);
-        isDelay = false;
+        isIdle = false;
+    }
+
+    private IEnumerator AttackDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+        isAttack = false;
+    }
+
+    private IEnumerator ReactDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+        if (reactCount > 0)
+        {
+            reactCount--;
+        }
+        if (reactCount == 0)
+        {
+            isReact = false;
+        }
+    }
+
+    private IEnumerator HitDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+        if (hitCount > 0)
+        {
+            hitCount--;
+        }
+        if (hitCount == 0)
+        {
+            isStun = false;
+        }
     }
 
     public void OnHit(int damage)
     {
         if (!isDead)
         {
-            database.data[enemyID].currentHP -= damage;
-
-            navMeshAgent.isStopped = true;
-            animator.SetBool("isTrace", false);
-            animator.SetTrigger("onHit");
-            
-            isDelay = true;
-            StartCoroutine(Delay(onHitDelay));
+            audioSource.volume = 0.75f;
+            audioSource.PlayOneShot(hitClip);
+            isHit = true;
+            isStun = true;
+            isTrace = true;
+            hitCount++;
+            currentHP -= damage;
         }
     }
 
     public void OnAttackCollision()
     {
         attackCollision.SetActive(true);
-    }
-
-    public void OnStatChanged(StatsObject stats)
-    {
-        // player stats 
-        // 죽었을 때
-        // 체력이 변하면 OnStatChanged
-        // Update 대신 이걸 써라!!!
     }
 }

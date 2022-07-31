@@ -16,9 +16,10 @@ public class TimeManager : MonoBehaviour
     private float halftimeOfDay;
     private bool isAM;
     [SerializeField]
-    private int day;
+    private int day = 1;
     [SerializeField]
-    private int hour;
+    private int hour = 6;
+    private float percentHour; // hour / 24, float value between 0 ~ 1
 
     [SerializeField]
     private int spReduceStandardTime = 20;
@@ -34,12 +35,18 @@ public class TimeManager : MonoBehaviour
     private ClockUI clock;
     private StatsObject playerStats;
 
+    [SerializeField]
+    private Light sun;
+    private float fadeOutTime;
+
     public int GetDay() => day;
     public int GetHour() => hour;
     public bool GetIsAM() => isAM;
     public float GetHalftime() => halftimeOfDay;
+    public bool GetIsDay() => (isAM && hour >= 5) || (!isAM && hour < 10);
 
     public Action<int> OnTheHour;
+    public Action<WeatherType, float, bool> OnChangeWeather;
 
     private void Awake()
     {
@@ -52,6 +59,8 @@ public class TimeManager : MonoBehaviour
             Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
+        // get time data from file
+        GameManager.Instance.OnGameManagerStart += GetTimeData;
     }
 
     private void Start()
@@ -63,20 +72,35 @@ public class TimeManager : MonoBehaviour
         hungerReduceConstValue = 100 / (realtimePerHour * hungerReduceStandardTime);
         thirstReduceConstValue = 100 / (realtimePerHour * thirstReduceStandardTime);
 
-        // get time data from file
-        timeLeft = GameManager.Instance.gameData.timeLeft;
+        fadeOutTime = realtimePerHour / 2;
+        GetTimeData();
+        StartCoroutine(ReduceStaminaByTime());
+    }
+
+    private void GetTimeData()
+    {
         isAM = GameManager.Instance.gameData.isAM;
         day = GameManager.Instance.gameData.day;
-
-        StartCoroutine(ReduceStaminaByTime());
+        hour = GameManager.Instance.gameData.hour;
+        timeLeft = GameManager.Instance.gameData.timeLeft;
     }
 
     private void Update()
     {
         timeLeft -= Time.deltaTime;
+        percentHour = ((isAM ? 12f : 24f) - timeLeft / realtimePerHour) / 24f;
+        sun.transform.localRotation = Quaternion.Euler(new Vector3(percentHour * 360f - 90f, 135f, 0f));
         if (12 - (int)Mathf.Ceil(timeLeft / realtimePerHour) != hour)
         {
             hour = 12 - (int)Mathf.Ceil(timeLeft / realtimePerHour);
+            if (isAM && hour == 5)
+            {
+                StartCoroutine(SunFadeIn());
+            }
+            else if (!isAM && hour == 6)
+            {
+                StartCoroutine(SunFadeOut());
+            }
             OnTheHour?.Invoke(hour);
         }
         if (timeLeft <= 0)
@@ -84,8 +108,35 @@ public class TimeManager : MonoBehaviour
             timeLeft = halftimeOfDay;
             isAM = !isAM;
             day = isAM ? day + 1 : day;
-            clock.UpdateClockUI();  
         }
+    }
+
+    IEnumerator SunFadeIn()
+    {
+        sun.gameObject.SetActive(true);
+        while (sun.intensity < 1f)
+        {
+            sun.intensity += Time.deltaTime / fadeOutTime;
+            if (sun.intensity >= 1f)
+            {
+                sun.intensity = 1f;
+            }
+            yield return null;
+        }
+    }
+
+    IEnumerator SunFadeOut()
+    {
+        while (sun.intensity > 0f)
+        {
+            sun.intensity -= Time.deltaTime / fadeOutTime;
+            if (sun.intensity <= 0f)
+            {
+                sun.intensity = 0f;
+            }
+            yield return null;
+        }
+        sun.gameObject.SetActive(false);
     }
 
     IEnumerator ReduceStaminaByTime()
@@ -101,8 +152,9 @@ public class TimeManager : MonoBehaviour
 
     public void ResetTime()
     {
-        timeLeft = GameManager.Instance.gameData.timeLeft = halftimeOfDay;
+        timeLeft = GameManager.Instance.gameData.timeLeft = halftimeOfDay / 2;
         isAM = GameManager.Instance.gameData.isAM = true;
         day = GameManager.Instance.gameData.day = 1;
+        hour = GameManager.Instance.gameData.hour = 6;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 /*
  * PlayerController is player's main script
@@ -13,15 +14,11 @@ public class PlayerController : MonoBehaviour
     private Transform cameraTransform;
     private CharacterController characterController;
     private PlayerAnimator playerAnimator;
+    private NavMeshAgent agent;
 
     // Key Setting
     private DoubleKeyPress[] keys;
-    [SerializeField]
-    private KeyCode jumpKeyCode = KeyCode.Space;
-    [SerializeField]
-    private KeyCode crouchKeyCode = KeyCode.LeftShift;
-    [SerializeField]
-    private KeyCode attackKeyCode = KeyCode.LeftControl;
+    private SerializableDictionary<string, KeyCode> KeySettings => GameManager.Instance.gameData.keySettings;
 
     // Movement Control
     [SerializeField]
@@ -32,19 +29,18 @@ public class PlayerController : MonoBehaviour
     private float gravity = -9.8f;
     private Vector3 moveDirection;
     public LayerMask mask;
+    public Transform target;
 
     // System Setting
     private bool isGround;
     private bool isDelay;
     private bool isMove;
-    private float attackDelay = 1.1335f;
+    private bool isAttack = false;
+    private readonly float attackDelay = 1.1335f;
     private bool walk = false;
     private bool run = false;
-    [SerializeField]
     private float crouchTime;
-    [SerializeField]
     private float walkTime;
-    [SerializeField]
     private float runTime;
 
     // Game system objects
@@ -53,16 +49,17 @@ public class PlayerController : MonoBehaviour
     private InventoryObject quickslot;
 
     // Attributes
-    private float con;
-    private float str;
     private float def;
-    private float handiness;
-    private float cooking;
+
+    [SerializeField]
+    private AudioClip[] walkClips;
+    private AudioSource audioSource;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -77,12 +74,20 @@ public class PlayerController : MonoBehaviour
         playerStat.OnStatChanged += OnStatChanged;
         QuestManager.Instance.OnRewardedQuest += OnRewardedQuest;
 
+        agent = GetComponent<NavMeshAgent>();
+        agent.updatePosition = false;
+        agent.updateRotation = true;
+
         keys = new[]
         {
-        new DoubleKeyPress(KeyCode.W),
-        new DoubleKeyPress(KeyCode.A),
-        new DoubleKeyPress(KeyCode.S),
-        new DoubleKeyPress(KeyCode.D),
+            new DoubleKeyPress(KeySettings[KeyName.Up.ToString()]),
+            new DoubleKeyPress(KeySettings[KeyName.Left.ToString()]),
+            new DoubleKeyPress(KeySettings[KeyName.Down.ToString()]),
+            new DoubleKeyPress(KeySettings[KeyName.Right.ToString()]),
+            new DoubleKeyPress(KeyCode.UpArrow),
+            new DoubleKeyPress(KeyCode.LeftArrow),
+            new DoubleKeyPress(KeyCode.DownArrow),
+            new DoubleKeyPress(KeyCode.RightArrow),
         };
     }
 
@@ -108,7 +113,7 @@ public class PlayerController : MonoBehaviour
             }
 
             // Jump : Press jumpKeyCode & Player is grounded
-            if (Input.GetKeyDown(jumpKeyCode) && isGround)
+            if (Input.GetKeyDown(KeySettings[KeyName.Jump.ToString()]) && isGround)
             {
                 moveDirection.y = jumpForce;
                 playerAnimator.OnJump();
@@ -123,13 +128,10 @@ public class PlayerController : MonoBehaviour
             for (int i = 0; i < keys.Length; i++)
             {
                 keys[i].Update();
+                keys[i].UpdateAction(() => walk = true, () => run = true);
             }
-            keys[0].UpdateAction(() => walk = true, () => run = true);
-            keys[1].UpdateAction(() => walk = true, () => run = true);
-            keys[2].UpdateAction(() => walk = true, () => run = true);
-            keys[3].UpdateAction(() => walk = true, () => run = true);
 
-            if (Input.GetKey(crouchKeyCode))
+            if (Input.GetKey(KeySettings[KeyName.Crouch.ToString()]))
             {
                 moveSpeed = 1.0f;
                 crouchTime += Time.deltaTime;
@@ -144,6 +146,8 @@ public class PlayerController : MonoBehaviour
             {
                 moveSpeed = 5.0f;
                 runTime += Time.deltaTime;
+                audioSource.clip = walkClips[1];
+                audioSource.Play();
                 playerStat.AddStatusCurrentValue(StatusType.SP, -0.005f);
                 if (runTime > 10f)
                 {
@@ -155,6 +159,8 @@ public class PlayerController : MonoBehaviour
             {
                 moveSpeed = 2.0f;
                 walkTime += Time.deltaTime;
+                audioSource.clip = walkClips[0];
+                audioSource.Play();
                 playerStat.AddStatusCurrentValue(StatusType.SP, -0.001f);
                 if (walkTime > 10f)
                 {
@@ -164,15 +170,38 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                audioSource.Stop();
                 crouchTime = 0;
                 walkTime = 0;
                 runTime = 0;
                 moveSpeed = 0;
             }
 
+            if (target != null)
+            {
+                if (target.GetComponent<IInteractable>() != null)
+                {
+                    float calcDistance = Vector3.Distance(target.position, transform.position);
+                    float range = target.GetComponent<IInteractable>().Distance;
+                    if (calcDistance <= range)
+                    {
+                        SetTarget(target, range);
+                    }
+                }
+            }
+
+            if (target != null)
+            {
+                if(target.GetComponent<IInteractable>() != null)
+                {
+                    IInteractable interactable = target.GetComponent<IInteractable>();
+                    interactable.Interact(this);
+                }
+            }
+
             Vector3 movement;
             isMove = !(moveDirection.x == 0 && moveDirection.z == 0);
-            if (isMove) // Player Move (x, y, z)
+            if (isMove && !isAttack) // Player Move (x, y, z)
             {
                 // cameraTransform.(x, y, z) = cameraTransform.(right, up, forward)
                 Vector3 lookForward = new Vector3(cameraTransform.forward.x, 0f, cameraTransform.forward.z).normalized;
@@ -188,6 +217,7 @@ public class PlayerController : MonoBehaviour
             else // Player Move (0, y, 0)
             {
                 movement = new Vector3(0, moveDirection.y, 0);
+                audioSource.Stop();
                 walk = false;
                 run = false;
             }
@@ -197,15 +227,35 @@ public class PlayerController : MonoBehaviour
             playerAnimator.OnMove(isMove, moveSpeed);
 
             // Attack : left control key & isDelay = false
-            if (Input.GetKeyDown(attackKeyCode) && !isDelay)
+            if (Input.GetKeyDown(KeySettings[KeyName.Attack.ToString()]) && !isDelay && !isAttack)
             {
                 isDelay = true;
+                isAttack = true;
                 playerAnimator.OnWeaponAttack();
                 playerStat.AddStatusCurrentValue(StatusType.SP, -1);
                 StartCoroutine(Delay(attackDelay));
             }
         }
     }
+
+    public void SetTarget(Transform newTarget, float stoppingDistance)
+    {
+        target = newTarget;
+
+        agent.stoppingDistance = stoppingDistance - 0.05f;
+        agent.updateRotation = false;
+        agent.SetDestination(newTarget.transform.position);
+    }
+    
+    public void RemoveTarget()
+    {
+        target = null;
+        agent.stoppingDistance = 0.00f;
+        agent.updateRotation = true;
+
+        agent.ResetPath();
+    }
+
 
     public void OnHit(float damage)
     {
@@ -226,6 +276,11 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         isDelay = false;
+
+        if (isAttack)
+        {
+            isAttack = false;
+        }
     }
 
     public void OnStatChanged(StatsObject stats)

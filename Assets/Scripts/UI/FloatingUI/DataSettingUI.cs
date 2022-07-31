@@ -9,6 +9,11 @@ public class DataSettingUI : UserInterface
     [SerializeField]
     private GameObject exitAlertWindow;
 
+    protected override void Awake()
+    {
+        // do nothing
+    }
+
     public void OnClickResetGame()
     {
         resetAlertWindow.SetActive(true);

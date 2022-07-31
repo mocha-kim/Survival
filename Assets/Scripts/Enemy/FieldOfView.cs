@@ -14,9 +14,9 @@ public class FieldOfView : MonoBehaviour
     public float radius = 15f;
     [SerializeField, Range(0, 360)]
     public float angle = 120;
+    private float distanceToTarget;
 
     public GameObject playerRef;
-
     public LayerMask targetMask;
     public LayerMask obstructionMask;
 
@@ -25,6 +25,7 @@ public class FieldOfView : MonoBehaviour
     private void Start()
     {
         StartCoroutine(FOVRoutine());
+        playerRef = GameObject.FindWithTag("Player");
     }
 
     private IEnumerator FOVRoutine()
@@ -49,17 +50,18 @@ public class FieldOfView : MonoBehaviour
 
             if (Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
             {
-                float distanceToTarget = Vector3.Distance(transform.position, target.position);
+                distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
-                    canSeePlayer = true;
-                else
-                    canSeePlayer = false;
+                canSeePlayer = !Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask);
             }
             else
+            {
                 canSeePlayer = false;
+            }
         }
         else if (canSeePlayer)
+        {
             canSeePlayer = false;
+        }
     }
 }

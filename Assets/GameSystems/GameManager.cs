@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -12,12 +13,17 @@ public class GameManager : MonoBehaviour
     public InventoryObject inventory;
     public InventoryObject quickslot;
 
+    public KeyCode escapeKey = KeyCode.Escape;
+
     [SerializeField]
     private ItemDatabase itemDatabase;
     [SerializeField]
     private EnemyDatabase enemyDatabase;
 
+    public Action OnGameManagerStart;
+
     private bool isGamePlaying = true;
+
     public bool IsGamePlaying
     {
         get
@@ -37,6 +43,12 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        LoadGame(gameData.playerName);
+        OnGameManagerStart?.Invoke();
     }
 
     private void Update()
@@ -176,7 +188,7 @@ public class GameManager : MonoBehaviour
     {
         bool success = true;
 
-        success = SaveLoad.SaveData(gameData, "/PlayerData/" + playerName + "_g") == SaveLoad.Code.Success && success;
+        success = SaveLoad.LoadData(gameData, "/PlayerData/" + playerName + "_g") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(playerStats, "/PlayerData/" + playerName + "_s") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(QuestManager.Instance.playerQuests, "/PlayerData/" + playerName + "_q") == SaveLoad.Code.Success && success;
         success = SaveLoad.LoadData(inventory, "/PlayerData/" + playerName + "_i") == SaveLoad.Code.Success && success;

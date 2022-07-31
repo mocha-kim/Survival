@@ -14,10 +14,14 @@ public class GameDataContainer : ScriptableObject
     public int hour;
 
     public WeatherType weather;
+    public SkyType sky;
     public int weatherActivationHour;
     public float temperature;
 
     public SerializableDictionary<string, KeyCode> keySettings = new();
+    public float masterVol;
+    public float bgmVol;
+    public float sfxVol;
 
     public void ResetData(string playerName)
     {
@@ -27,9 +31,10 @@ public class GameDataContainer : ScriptableObject
         timeLeft = TimeManager.Instance.GetHalftime();
         isAM = true;
         day = 1;
-        hour = 0;
+        hour = 6;
 
         weather = WeatherType.Sunny;
+        sky = SkyType.Sunrise;
         weatherActivationHour = 24;
         temperature = -5f;
 
@@ -48,5 +53,9 @@ public class GameDataContainer : ScriptableObject
         keySettings["Down"] = KeyCode.S;
         keySettings["Right"] = KeyCode.D;
         keySettings["Left"] = KeyCode.A;
+
+        masterVol = 0;
+        bgmVol = 0;
+        sfxVol = 0;
     }
 }

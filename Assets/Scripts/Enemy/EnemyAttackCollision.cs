@@ -35,4 +35,8 @@ public class EnemyAttackCollision : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void SetEnemyInfo(int ID)
+    {
+        enemyID = ID;
+    }
 }

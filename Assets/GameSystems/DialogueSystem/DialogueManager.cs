@@ -20,10 +20,11 @@ public class DialogueManager : MonoBehaviour
     // Component
     public GameObject toChat;     // [F] To Chat
     public GameObject dialogueUI; // Dialogue
-    public Button YesButton;      // Yes Button
-    public Button NoButton;       // No Button
+    public GameObject YesButton;  // Yes Button
+    public GameObject NoButton;   // No Button
     public Text nameText;         // NPC Name
     public Text dialogueText;     // NPC Dialogue
+    public QuestObject quest;     // Quest
 
     // Setting
     [SerializeField]
@@ -38,11 +39,13 @@ public class DialogueManager : MonoBehaviour
     private string[] dialogue;
     private bool letterIsMultiplied = false;
     public bool dialogueActive = false;
-    public bool isEnd = false;
-    private bool dialogueEnded = false;
+    public bool isaccept = false;
+    public bool dialogueEnded = false;
     private bool inRange = false;
-    private float dialogueTime;
-    private int lineLength;
+    [SerializeField]
+    private bool isQuest = false;
+    private float dialogueTime = 0;
+    private int dialogueLine;
     private int currentLine;
     private int stringLength;
     private int currentString;
@@ -59,38 +62,36 @@ public class DialogueManager : MonoBehaviour
     private void Start()
     {
         dialogueText.text = "";
-        dialogueTime = 0;
     }
 
     public void EnterRangeOfNPC()
     {
         inRange = true;
         toChat.SetActive(true);
+        if(dialogueActive == true)
+        {
+            toChat.SetActive(false);
+        }
+        isQuest = (quest == null) ? false : true;
     }
 
     public void StartDialogue(in string[] sentences)
     {
-        isEnd = false;
-        dialogue = sentences;
         inRange = true;
         toChat.SetActive(false);
         dialogueUI.SetActive(true);
+        dialogue = sentences;
         nameText.text = names;
         if (Input.GetKeyDown(dialogueKeyCode) && !dialogueActive)
         {
+            if (GameManager.Instance.IsGamePlaying)
+            {
+                GameManager.Instance.StopGame();
+            }
+
             dialogueActive = true;
             OnStartDialogue?.Invoke();
             StartCoroutine(Dialogue());
-        }
-    }
-
-    private IEnumerator WaitForUnscaledSeconds(float time)
-    {
-        dialogueTime = 0f;
-        while (dialogueTime < time)
-        {
-            yield return null;
-            dialogueTime += Time.unscaledDeltaTime;
         }
     }
 
@@ -98,17 +99,17 @@ public class DialogueManager : MonoBehaviour
     {
         if (inRange == true)
         {
-            lineLength = dialogue.Length;
+            dialogueLine = dialogue.Length;
             currentLine = 0;
 
-            while (currentLine < lineLength || !letterIsMultiplied)
+            while (currentLine < dialogueLine || !letterIsMultiplied)
             {
                 if (!letterIsMultiplied)
                 {
                     letterIsMultiplied = true;
                     StartCoroutine(DisplayString(dialogue[currentLine++]));
 
-                    if (currentLine >= lineLength)
+                    if (currentLine >= dialogueLine)
                     {
                         dialogueEnded = true;
                     }
@@ -118,8 +119,11 @@ public class DialogueManager : MonoBehaviour
 
             while (true)
             {
-                //if(YesButton.onClick.AddListener())
-                if (Input.GetKeyDown(dialogueKeyCode) && !dialogueEnded)
+                if (isQuest && quest.status == QuestStatus.None && dialogueEnded)
+                {
+                    QuestSelection();
+                }
+                else if (Input.GetKeyDown(dialogueKeyCode) && !dialogueEnded)
                 {
                     break;
                 }
@@ -128,17 +132,12 @@ public class DialogueManager : MonoBehaviour
 
             dialogueEnded = false;
             dialogueActive = false;
-            DropDialogue();
+            OutOfRange();
         }
     }
 
     private IEnumerator DisplayString(string dialogueString)
     {
-        if (GameManager.Instance.IsGamePlaying)
-        {
-            GameManager.Instance.StopGame();
-        }
-
         if (inRange == true)
         {
             stringLength = dialogueString.Length;
@@ -162,35 +161,46 @@ public class DialogueManager : MonoBehaviour
                         yield return WaitForUnscaledSeconds(readSpeed);
                     }
                 }
-                else
-                {
-                    dialogueEnded = false;
-                    break;
-                }
                 yield return null;
             }
 
             while (true)
             {
-                if (Input.GetKeyDown(dialogueKeyCode))
+                if (isQuest && quest.status == QuestStatus.None && dialogueEnded)
+                {
+                    yield return null;
+                }
+                else if (Input.GetKeyDown(dialogueKeyCode))
                 {
                     break;
                 }
                 yield return null;
             }
 
-            isEnd = true;
             dialogueEnded = false;
             letterIsMultiplied = false;
+            dialogueText.text = "";
+        }
+    }
+
+    private IEnumerator WaitForUnscaledSeconds(float time)
+    {
+        dialogueTime = 0f;
+        while (dialogueTime < time)
+        {
+            yield return null;
+            dialogueTime += Time.unscaledDeltaTime;
         }
     }
 
     public void DropDialogue()
     {
-        toChat.SetActive(false);
+        dialogueEnded = false;
+        dialogueActive = false;
+        toChat.SetActive(true);
         dialogueUI.SetActive(false);
-        //YesButton.SetActive(false);
-        //NoButton.SetActive(false);
+        YesButton.SetActive(false);
+        NoButton.SetActive(false);
         OnEndDialogue?.Invoke();
 
         if (!GameManager.Instance.IsGamePlaying)
@@ -204,13 +214,14 @@ public class DialogueManager : MonoBehaviour
         inRange = false;
         if (inRange == false)
         {
+            dialogueEnded = false;
             letterIsMultiplied = false;
             dialogueActive = false;
             StopAllCoroutines();
             toChat.SetActive(false);
             dialogueUI.SetActive(false);
-            //YesButton.SetActive(false);
-            //NoButton.SetActive(false);
+            YesButton.SetActive(false);
+            NoButton.SetActive(false);
         }
 
         if (!GameManager.Instance.IsGamePlaying)
@@ -221,7 +232,19 @@ public class DialogueManager : MonoBehaviour
 
     public void QuestSelection()
     {
-        //YesButton.SetActive(true);
-        //NoButton.SetActive(true);
+        YesButton.SetActive(true);
+        NoButton.SetActive(true);
+    }
+
+    public void OnClickYesButton()
+    {
+        isaccept = true;
+        OutOfRange();
+    }
+
+    public void OnClickNoButton()
+    {
+        isaccept = false;
+        OutOfRange();
     }
 }

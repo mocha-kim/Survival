@@ -14,17 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     id: 2
-    targetID: 0
+    targetID: 1
     destNPCID: 0
-    currentCount: 10
-    goalCount: 10
+    currentCount: 0
+    goalCount: 1
     rewardGold: 100
     rewardItemIds: 
     rewardItemCounts: 
+    updateFriendliness:
+    - camp: {fileID: 11400000, guid: ebf5f0ff2a660ea4392218da0dacab37, type: 2}
+      addFriendliness: 10
+    - camp: {fileID: 11400000, guid: 7f5b510a8a47b2b4faeb2742c22a1d0d, type: 2}
+      addFriendliness: 3
+    - camp: {fileID: 11400000, guid: 97953b7a4050dd64694a2142929ce8fc, type: 2}
+      addFriendliness: -5
   type: 1
   camp: 2
   status: 0
-  title: "\uD14C\uC2A4\uD2B83"
-  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 10\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
-  description: "0\uBC88 \uC544\uC774\uD15C\uC744 10\uAC1C \uAC00\uC838\uC624\uB294
-    \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  title: "\uBB34\uAE30\uAC00 \uD544\uC694\uD574!"
+  summary: "\uC57C\uAD6C\uBC29\uB9DD\uC774 1\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
+  description: "\uC57C\uAD6C\uBC29\uB9DD\uC774 1\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

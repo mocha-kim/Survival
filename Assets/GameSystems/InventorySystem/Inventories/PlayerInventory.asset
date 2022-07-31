@@ -18,10 +18,42 @@ MonoBehaviour:
     slots:
     - allowedType: 
       item:
-        id: -1
-        name: 
-        effects: []
-      amount: 0
+        id: 0
+        name: "\uAC10\uC790"
+        effects:
+        - type: 0
+          statusType: 0
+          attributeType: 0
+          conditionType: 0
+          value: 20
+        - type: 0
+          statusType: 2
+          attributeType: 0
+          conditionType: 0
+          value: 5
+      amount: 19
+    - allowedType: 
+      item:
+        id: 2
+        name: "\uC694\uB9AC\uCC45"
+        effects:
+        - type: 1
+          statusType: 0
+          attributeType: 4
+          conditionType: 0
+          value: 20
+      amount: 1
+    - allowedType: 
+      item:
+        id: 4
+        name: "\uBE75"
+        effects:
+        - type: 1
+          statusType: 0
+          attributeType: 1
+          conditionType: 0
+          value: 2
+      amount: 37
     - allowedType: 
       item:
         id: -1
@@ -112,6 +144,44 @@ MonoBehaviour:
         name: 
         effects: []
       amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+  ItemPocketSlot:
+    slots:
     - allowedType: 
       item:
         id: -1

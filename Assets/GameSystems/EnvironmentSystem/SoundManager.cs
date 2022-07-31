@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -18,6 +16,7 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField]
     private AudioClip[] bgmClips;
+
     [SerializeField]
     private AudioClip[] sfxClips;
 
@@ -34,6 +33,14 @@ public class SoundManager : MonoBehaviour
             Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
+        GameManager.Instance.OnGameManagerStart += GetSoundData;
+    }
+
+    private void GetSoundData()
+    {
+        SetMasterVolume(GameManager.Instance.gameData.masterVol);
+        SetBGMVolume(GameManager.Instance.gameData.bgmVol);
+        SetSFXVolume(GameManager.Instance.gameData.sfxVol);
     }
 
     public void PlayBGM()
@@ -46,25 +53,29 @@ public class SoundManager : MonoBehaviour
         bgm.Pause();
     }
 
-    public void PlaySFX(AudioClip clip)
+    public void PlaySFX(SFXType type)
     {
-        envSFX.PlayOneShot(clip);
+        if ((int)type < sfxClips.Length)
+            envSFX.PlayOneShot(sfxClips[(int)type]);
     }
 
     public void SetMasterVolume(float value)
     {
+        GameManager.Instance.gameData.masterVol = value;
         float volume = (value == minVolume) ? -80f : value;
         mixer.SetFloat("MasterVolume", volume);
     }
 
     public void SetBGMVolume(float value)
     {
+        GameManager.Instance.gameData.bgmVol = value;
         float volume = (value == minVolume) ? -80f : value;
         mixer.SetFloat("BGMVolume", volume);
     }
 
     public void SetSFXVolume(float value)
     {
+        GameManager.Instance.gameData.sfxVol = value;
         float volume = (value == minVolume) ? -80f : value;
         mixer.SetFloat("SFXVolume", volume);
     }

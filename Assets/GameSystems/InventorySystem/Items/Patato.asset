@@ -23,10 +23,10 @@ MonoBehaviour:
       statusType: 0
       attributeType: 0
       conditionType: 0
-      value: 50
+      value: 20
     - type: 0
       statusType: 2
       attributeType: 0
       conditionType: 0
-      value: 20
-  description: "\uAC10\uC790\uB2E4."
+      value: 5
+  description: "\uAC10\uC790 \uAC10\uC790\uC5D0 \uAC10"

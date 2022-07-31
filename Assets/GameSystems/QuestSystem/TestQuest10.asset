@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     id: 9
-    targetID: 2
+    targetID: 5
     destNPCID: 0
     currentCount: 0
     goalCount: 5
-    rewardGold: 0
+    rewardGold: 30
     rewardItemIds: 00000000
     rewardItemCounts: 04000000
+    updateFriendliness: []
   type: 1
   camp: 2
   status: 0
-  title: "\uD14C\uC2A4\uD2B810"
-  summary: "2\uBC88 \uC544\uC774\uD15C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
-  description: "2\uBC88 \uC544\uC774\uD15C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294
-    \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  title: "\uBAA9\uC774 \uB9C8\uB974\uAD70\uC694..."
+  summary: "\uBB3C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8"
+  description: "\uBB3C\uC744 5\uAC1C \uAC00\uC838\uC624\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

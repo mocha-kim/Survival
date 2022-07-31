@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52568e2977dfd44d7b3c9db6b8b54065, type: 3}
   m_Name: CookingBook
   m_EditorClassIdentifier: 
-  type: 0
+  type: 3
   isStackable: 0
   icon: {fileID: 21300000, guid: adac0f19069d1de4d87d4c4304283920, type: 3}
   data:

@@ -7,6 +7,7 @@ public class QuestManager : MonoBehaviour
     private static QuestManager instance;
     public static QuestManager Instance => instance;
 
+    public CampDatabase campDatabase;
     public QuestDatabase questDatabase;
     public QuestDataContainer playerQuests;
 
@@ -148,6 +149,11 @@ public class QuestManager : MonoBehaviour
         for (int i = 0; i < quest.data.rewardItemIds.Count; i++)
         {
             inventory.AddItem(quest.data.rewardItemIds[i], quest.data.rewardItemCounts[i]);
+        }
+
+        for (int i = 0; i < quest.data.updateFriendliness.Count; i++)
+        {
+            quest.data.updateFriendliness[i].camp.friendliness += quest.data.updateFriendliness[i].addFriendliness;
         }
 
         playerQuests.acceptedQuests.Remove(quest);

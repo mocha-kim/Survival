@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using System;
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -31,6 +31,21 @@ public class KeySettingUI : UserInterface
 
     [SerializeField]
     private EventSystem eventSystem;
+
+    private void OnEnable()
+    {
+        string[] keynames = Enum.GetNames(typeof(KeyName));
+        TextMeshProUGUI[] tmps = transform.GetComponentsInChildren<TextMeshProUGUI>();
+        for (int i = 1; i < 14; i++)
+        {
+            tmps[i].text = GameManager.Instance.gameData.keySettings[keynames[i - 1]].ToString();
+        }
+    }
+
+    protected override void Awake()
+    {
+        // do nothing
+    }
 
     public void OnClickKey(string keyName)
     {
@@ -93,10 +108,10 @@ public class KeySettingUI : UserInterface
         {
             if (pair.Value == selectedKey)
             {
+                eventSystem.SetSelectedGameObject(null);
                 return false;
             }
         }
-        GameManager.Instance.gameData.keySettings[keyName] = selectedKey;
 
         if (isLongkey)
         {
@@ -108,7 +123,8 @@ public class KeySettingUI : UserInterface
         }
         go.GetComponentInChildren<TextMeshProUGUI>().text = selectedKey.ToString();
         eventSystem.SetSelectedGameObject(null);
-        Debug.Log("Changed " + keyName + "key: " + GameManager.Instance.gameData.keySettings[keyName].ToString() + " to " + selectedKey);
+        Debug.Log("Change " + keyName + " key: " + GameManager.Instance.gameData.keySettings[keyName].ToString() + " to " + selectedKey);
+        GameManager.Instance.gameData.keySettings[keyName] = selectedKey;
         return true;
     }
 }

@@ -24,20 +24,10 @@ MonoBehaviour:
       amount: 0
     - allowedType: 000000000100000002000000
       item:
-        id: 0
-        name: Potato
-        effects:
-        - type: 0
-          statusType: 0
-          attributeType: 0
-          conditionType: 0
-          value: 50
-        - type: 0
-          statusType: 2
-          attributeType: 0
-          conditionType: 0
-          value: 20
-      amount: 2
+        id: -1
+        name: 
+        effects: []
+      amount: 0
     - allowedType: 000000000100000002000000
       item:
         id: -1
@@ -45,6 +35,56 @@ MonoBehaviour:
         effects: []
       amount: 0
     - allowedType: 000000000100000002000000
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+  ItemPocketSlot:
+    slots:
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
+      item:
+        id: -1
+        name: 
+        effects: []
+      amount: 0
+    - allowedType: 
       item:
         id: -1
         name: 

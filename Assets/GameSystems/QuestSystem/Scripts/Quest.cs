@@ -14,6 +14,14 @@ public class Quest
     public int rewardGold;
     public List<int> rewardItemIds = new();
     public List<int> rewardItemCounts = new();
+    public List<Friendliness> updateFriendliness;
+
+    [Serializable]
+    public struct Friendliness
+    {
+        public CampFriendliness camp;
+        public int addFriendliness;
+    }
 
     public Quest()
     {

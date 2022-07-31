@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     id: 8
-    targetID: 0
+    targetID: 3
     destNPCID: 0
     currentCount: 0
     goalCount: 1
-    rewardGold: 0
+    rewardGold: 10
     rewardItemIds: 00000000
     rewardItemCounts: 04000000
+    updateFriendliness: []
   type: 2
   camp: 2
   status: 0
-  title: "\uD14C\uC2A4\uD2B89"
-  summary: "0\uBC88 \uC544\uC774\uD15C\uC744 0\uBC88 NPC\uC5D0\uAC8C 1\uAC1C \uC804\uB2EC\uD558\uB294
-    \uD018\uC2A4\uD2B8"
-  description: "0\uBC88 \uC544\uC774\uD15C\uC744 0\uBC88 NPC\uC5D0\uAC8C 1\uAC1C
-    \uC804\uB2EC\uD558\uB294 \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  title: "\uAD70\uC778 \uC544\uC800\uC528\uC5D0\uAC8C \uC804\uD574\uC918\uC694!"
+  summary: "\uBE75\uC744 [ NPC 11]\uC5D0\uAC8C 3\uAC1C \uC804\uB2EC\uD558\uB294 \uD018\uC2A4\uD2B8"
+  description: "\uBE75\uC744 [ NPC 11]\uC5D0\uAC8C 3\uAC1C \uC804\uB2EC\uD558\uB294
+    \uD018\uC2A4\uD2B8\uC785\uB2C8\uB2E4."

@@ -7,11 +7,7 @@ public class InterfaceManager : MonoBehaviour
     private static InterfaceManager instance;
     public static InterfaceManager Instance => instance;
 
-    public KeyCode escapeKey = KeyCode.Escape;
-    public KeyCode inventoryKey = KeyCode.I;
-    public KeyCode characterKey = KeyCode.C;
-    public KeyCode questKey = KeyCode.J;
-    public KeyCode pickUpKey = KeyCode.F;
+    public KeyCode EscapeKey => GameManager.Instance.escapeKey;
 
     public GameObject inventoryUI;
     public GameObject characterUI;
@@ -20,6 +16,8 @@ public class InterfaceManager : MonoBehaviour
     public GameObject itemPocketUI;
 
     public List<GameObject> activeUIs = new();
+
+    private SerializableDictionary<string, KeyCode> KeySettings => GameManager.Instance.gameData.keySettings;
 
     private void Awake()
     {
@@ -45,7 +43,7 @@ public class InterfaceManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(escapeKey))
+        if (Input.GetKeyDown(EscapeKey))
         {
             if (DialogueManager.Instance.dialogueActive)
             {
@@ -61,21 +59,21 @@ public class InterfaceManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(inventoryKey) && GameManager.Instance.IsGamePlaying)
+        if (Input.GetKeyDown(KeySettings[KeyName.Inventory.ToString()]) && GameManager.Instance.IsGamePlaying)
         {
             ToggleUI(inventoryUI);
         }
-        if (Input.GetKeyDown(characterKey) && GameManager.Instance.IsGamePlaying)
+        if (Input.GetKeyDown(KeySettings[KeyName.Character.ToString()]) && GameManager.Instance.IsGamePlaying)
         {
             ToggleUI(characterUI);
         }
-        if (Input.GetKeyDown(questKey) && GameManager.Instance.IsGamePlaying)
+        if (Input.GetKeyDown(KeySettings[KeyName.Quest.ToString()]) && GameManager.Instance.IsGamePlaying)
         {
             ToggleUI(questUI);
         }
-        if (Input.GetKeyDown(pickUpKey) && GameManager.Instance.IsGamePlaying)
+        if (Input.GetKeyDown(KeySettings[KeyName.Interact.ToString()]) && GameManager.Instance.IsGamePlaying)
         {
-            ItemPocketUI.Instance.TogglePocketUI();
+
         }
     }
 

@@ -9,6 +9,7 @@ public class InventoryObject : ScriptableObject
     public ItemDatabase database;
     [SerializeField]
     private Inventory data = new(24);
+    public Inventory ItemPocketSlot = new(8);
 
     public InventorySlot[] Slots => data.slots;
 
@@ -33,6 +34,11 @@ public class InventoryObject : ScriptableObject
     public InventorySlot GetItemSlot(Item item) => Slots.FirstOrDefault(i => i.item.id == item.id);
     public InventorySlot GetItemSlot(int id) => Slots.FirstOrDefault(i => i.item.id == id);
     public InventorySlot GetEmptySlot() => Slots.FirstOrDefault(i => i.item.id == -1);
+
+    public void ResizeSlotSize(int size)
+    {
+        Array.Resize(ref data.slots, size);
+    }
 
     public bool AddItem(Item item, int amount)
     {
@@ -79,7 +85,7 @@ public class InventoryObject : ScriptableObject
 
     public void SwapItems(InventorySlot slotA, InventorySlot slotB)
     {
-        Debug.Log("Swap items : " + slotA + ", " + slotB);
+        Debug.Log("Swap items : " + slotA.ItemObject + ", " + slotB.ItemObject);
         if (slotA == slotB)
         {
             return;
